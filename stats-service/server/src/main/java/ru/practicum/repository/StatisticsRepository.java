@@ -25,7 +25,7 @@ public interface StatisticsRepository extends JpaRepository<Statistics, Long> {
             "GROUP BY st.app, st.uri " +
             "ORDER BY COUNT(st.ip) DESC ")
     List<StatisticsResponse> findByUriInAndStartBetweenUniqueIp(Iterable<String> uri, LocalDateTime start,
-                                                               LocalDateTime end);
+                                                                LocalDateTime end);
 
     @Query("SELECT new ru.practicum.dto.StatisticsResponse(st.app, st.uri, COUNT(DISTINCT st.ip)) " +
             "FROM Statistics AS st " +

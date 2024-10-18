@@ -3,7 +3,6 @@ package ru.practicum.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ru.practicum.StatisticsDto;
-import ru.practicum.model.App;
 import ru.practicum.model.Statistics;
 
 @Mapper(componentModel = "spring")
