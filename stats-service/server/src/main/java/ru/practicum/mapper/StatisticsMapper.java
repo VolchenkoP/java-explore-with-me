@@ -10,6 +10,7 @@ public interface StatisticsMapper {
     @Mapping(target = "app", source = "statistics.app.name")
     StatisticsDto toDto(Statistics statistics);
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "app", ignore = true)
     Statistics toEntity(StatisticsDto dto);
 
