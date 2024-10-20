@@ -32,12 +32,15 @@ public class StatisticsController {
                                                   @DateTimeFormat(pattern = Constants.DATE_PATTERN) String end,
                                                   @RequestParam(required = false, value = "uris") List<String> uris,
                                                   @RequestParam(required = false, value = "unique") boolean unique) {
+        log.info("Получение статистики по следующим параметрам: {}, {}, {}, {}.", start, end, uris, unique);
         return service.getStatistics(start, end, uris, unique);
     }
 
     @PostMapping("/hit")
     @ResponseStatus(HttpStatus.CREATED)
     public StatisticsDto createStatistics(@Valid @RequestBody StatisticsDto statisticsDto) {
+        log.info("Добалвение в статистику следующей информации: {}, {}, {}, {}.",
+                statisticsDto.getApp(), statisticsDto.getUri(), statisticsDto.getIp(), statisticsDto.getTimestamp());
         return service.createStatistics(statisticsDto);
     }
 }

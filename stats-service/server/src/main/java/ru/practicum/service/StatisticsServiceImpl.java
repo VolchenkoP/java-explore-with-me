@@ -31,27 +31,30 @@ public class StatisticsServiceImpl implements StatisticsService {
         App app = validationApp(dto.getApp());
         Statistics statistics = mapper.toEntity(dto);
         statistics.setApp(app);
+        log.info("Данные успешно добавлены в статистику");
         return mapper.toDto(statisticsRepository.save(statistics));
     }
 
     @Override
     public List<StatisticsResponse> getStatistics(String start, String end, List<String> uris, boolean unique) {
         LocalDateTime startTime = convertStringToLocalDateTime(decoderParameters(start));
+        log.info("Параметр даты начала успешно сконвертирован");
         LocalDateTime endTime = convertStringToLocalDateTime(decoderParameters(end));
+        log.info("Параметр даты окончания успешно сконвертирован");
 
         if (unique) {
             if (uris == null) {
-                log.info("");
+                log.info("Поиск всей статистики для уникального IP");
                 return getStatsForAllEndpointsByUniqueIp(startTime, endTime);
             }
-            log.info("");
+            log.info("Поиск статистики для уникального IP и списка ссылок");
             return getStatsByUniqueIp(startTime, endTime, uris);
         }
         if (uris == null) {
-            log.info("");
+            log.info("Поиск всей статистики");
             return getStatsForAllEndpointsByAllIp(startTime, endTime);
         }
-        log.info("");
+        log.info("Поиск статистики по списку ссылок");
         return getStatsByAllIp(startTime, endTime, uris);
     }
 
@@ -72,6 +75,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     private App validationApp(String appName) {
+        log.info("Поиск сервиса с именем: {}", appName);
         return appRepository.findByName(appName)
                 .orElseThrow(() -> new NotFoundException("Сервис с именем " + appName + " не найден"));
     }
