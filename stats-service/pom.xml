@@ -33,6 +33,7 @@
         <module>dto</module>
         <module>client</module>
         <module>server</module>
+        <module>utils</module>
     </modules>
 
     <build>

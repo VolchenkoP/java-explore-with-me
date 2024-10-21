@@ -40,7 +40,6 @@
 
     <modules>
         <module>stats-service</module>
-        <module>utils</module>
     </modules>
 
     <build>
