@@ -5,13 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.StatisticsDto;
 import ru.practicum.StatisticsResponse;
+import ru.practicum.constants.Constants;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.mapper.StatisticsMapper;
 import ru.practicum.model.App;
 import ru.practicum.model.Statistics;
 import ru.practicum.repository.AppRepository;
 import ru.practicum.repository.StatisticsRepository;
-import ru.practicum.utils.constants.Constants;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -43,14 +43,14 @@ public class StatisticsServiceImpl implements StatisticsService {
         log.info("Параметр даты окончания успешно сконвертирован");
 
         if (unique) {
-            if (uris == null) {
+            if (uris == null || uris.isEmpty()) {
                 log.info("Поиск всей статистики для уникального IP");
                 return getStatsForAllEndpointsByUniqueIp(startTime, endTime);
             }
             log.info("Поиск статистики для уникального IP и списка ссылок");
             return getStatsByUniqueIp(startTime, endTime, uris);
         }
-        if (uris == null) {
+        if (uris == null || uris.isEmpty()) {
             log.info("Поиск всей статистики");
             return getStatsForAllEndpointsByAllIp(startTime, endTime);
         }

@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.StatisticsDto;
 import ru.practicum.StatisticsResponse;
+import ru.practicum.constants.Constants;
 import ru.practicum.service.StatisticsService;
-import ru.practicum.utils.constants.Constants;
 
 import java.util.List;
 

@@ -7,11 +7,11 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.BaseClient;
 import ru.practicum.StatisticsDto;
+import ru.practicum.constants.Constants;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +51,6 @@ public class StatisticsClient extends BaseClient {
     }
 
     private String convertLocalDateTimeToString(LocalDateTime time) {
-        return time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        return time.format(Constants.DATE_FORMATTER);
     }
 }
