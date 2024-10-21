@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import org.springframework.boot.jackson.JsonComponent;
-import ru.practicum.utils.constants.Constants;
+import ru.practicum.constants.Constants;
 
 import java.io.IOException;
 import java.time.LocalDateTime;

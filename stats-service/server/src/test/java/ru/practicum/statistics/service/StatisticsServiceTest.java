@@ -10,9 +10,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.StatisticsDto;
 import ru.practicum.StatisticsResponse;
+import ru.practicum.constants.Constants;
 import ru.practicum.model.App;
 import ru.practicum.service.StatisticsService;
-import ru.practicum.utils.constants.Constants;
 
 import java.time.LocalDateTime;
 import java.util.List;

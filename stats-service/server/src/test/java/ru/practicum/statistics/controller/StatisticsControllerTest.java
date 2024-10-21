@@ -10,10 +10,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.StatisticsDto;
 import ru.practicum.StatisticsResponse;
+import ru.practicum.constants.Constants;
 import ru.practicum.controller.StatisticsController;
 import ru.practicum.model.App;
 import ru.practicum.service.StatisticsService;
-import ru.practicum.utils.constants.Constants;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
