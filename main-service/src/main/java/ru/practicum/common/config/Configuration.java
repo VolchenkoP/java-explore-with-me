@@ -11,7 +11,7 @@ public class Configuration {
 
     private final RestTemplateBuilder restTemplateBuilder;
 
-    @Value("${server.url}")
+    @Value("${stats-server.url}")
     private String serverUri;
 
     public Configuration(RestTemplateBuilder restTemplateBuilder) {
