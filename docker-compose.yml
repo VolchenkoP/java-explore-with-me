@@ -48,7 +48,7 @@ services:
     image: postgres:16.1
     container_name: mainDb
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - ./volumes/mainDb:/var/lib/postgresql/data/
 
