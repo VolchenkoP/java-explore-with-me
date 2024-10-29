@@ -13,7 +13,7 @@ public class Configuration {
     @Autowired
     private RestTemplateBuilder restTemplateBuilder;
 
-    @Value("${stats-server.url}")
+    @Value("${server.url}")
     private String serverUri;
 
     @Bean
