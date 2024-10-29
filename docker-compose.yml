@@ -15,7 +15,7 @@ services:
       retries: 10
 
   stats-server:
-    build: stat/stat-server
+    build: stats-service/server
     image: ewm-stats-server
     container_name: ewm-stats-server
     ports:
