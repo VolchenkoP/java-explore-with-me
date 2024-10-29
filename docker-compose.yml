@@ -1,8 +1,25 @@
 services:
+  stats-db:
+    image: postgres:16.1
+    container_name: stats-db
+    ports:
+      - "6542:5432"
+    volumes:
+      - ./volumes/statDb:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=statsDb
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=12345
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
   stats-server:
     build: stats-service/server
-    image: stats-service/server
-    container_name: statsApp
+    image: ewm-stats-server
+    container_name: ewm-stats-server
     ports:
       - "9090:9090"
     depends_on:
@@ -11,17 +28,18 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/statsDb
       - SPRING_DATASOURCE_USERNAME=dbuser
       - SPRING_DATASOURCE_PASSWORD=12345
+      - EWM_MAIN_SERVER_URL=http://main-server:9090
 
-  stats-db:
+  main-db:
     image: postgres:16.1
-    container_name: statsDb
+    container_name: main-db
     ports:
-      - "5432:5432"
+      - "6541:5432"
     volumes:
-      - ./volumes/statDb:/var/lib/postgresql/data/
+      - ./volumes/mainDb:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=statsDb
-      - POSTGRES_USER=dbuser
+      - POSTGRES_DB=main-server
+      - POSTGRES_USER=user
       - POSTGRES_PASSWORD=12345
     healthcheck:
       test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
@@ -31,33 +49,15 @@ services:
 
   main-server:
     build: main-service
-    image: main-service
-    container_name: mainService
+    image: ewm-main-service
+    container_name: ewm-main-service
     ports:
       - "8080:8080"
     depends_on:
       - main-db
-
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://main-db:5432/mainDb
       - SPRING_DATASOURCE_USERNAME=dbuser
       - SPRING_DATASOURCE_PASSWORD=12345
-      - STATS_SERVER_URL=http://server:9090
-  main-db:
-    image: postgres:16.1
-    container_name: mainDb
-    ports:
-      - "5433:5432"
-    volumes:
-      - ./volumes/mainDb:/var/lib/postgresql/data/
-
-    environment:
-      - POSTGRES_DB=mainDb
-      - POSTGRES_USER=dbuser
-      - POSTGRES_PASSWORD=12345
-
-    healthcheck:
-      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
-      timeout: 5s
-      interval: 5s
-      retries: 10
+      - STATS_SERVER_URL=http://stats-server:9090
+  
