@@ -36,7 +36,7 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "empty annotation")
+    @NotBlank
     @Length(min = 20, max = 2000)
     private String annotation;
 

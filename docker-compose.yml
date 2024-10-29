@@ -1,8 +1,8 @@
 services:
   stats-server:
     build: stats-service/server
-    image: ewm-stats-server
-    container_name: ewm-stats-server
+    image: stats-service/server
+    container_name: statsApp
     ports:
       - "9090:9090"
     depends_on:
@@ -29,11 +29,10 @@ services:
       interval: 5s
       retries: 10
 
-
   main-server:
     build: main-service
-    image: ewm-main-service
-    container_name: ewm-main-service
+    image: main-service
+    container_name: mainService
     ports:
       - "8080:8080"
     depends_on:
