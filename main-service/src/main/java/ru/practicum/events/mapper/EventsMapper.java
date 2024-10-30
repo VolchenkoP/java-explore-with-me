@@ -13,7 +13,7 @@ import ru.practicum.events.model.EventStates;
 
 import java.time.LocalDateTime;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface EventsMapper {
 
     @Mapping(target = "category", ignore = true)

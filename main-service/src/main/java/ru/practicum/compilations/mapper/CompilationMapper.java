@@ -7,7 +7,7 @@ import ru.practicum.compilations.dto.CompilationResponse;
 import ru.practicum.compilations.dto.CompilationUpdated;
 import ru.practicum.compilations.model.Compilation;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface CompilationMapper {
 
     Compilation toEntity(CompilationRequest request);
