@@ -88,7 +88,7 @@ public interface EventsMapper {
                 event.setState(String.valueOf(EventStates.CANCELED));
             }
 
-            if (eventUpdated.getStateAction().equals(String.valueOf(EventStateAction.SEND_TO_REVIEW_EVENT))) {
+            if (eventUpdated.getStateAction().equals(String.valueOf(EventStateAction.SEND_TO_REVIEW))) {
                 event.setState(String.valueOf(EventStates.PENDING));
             }
 
