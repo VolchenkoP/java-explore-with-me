@@ -84,7 +84,7 @@ public interface EventsMapper {
             }
 
             if ((eventUpdated.getStateAction().equals(String.valueOf(EventStateAction.REJECT_EVENT)))
-                    || (eventUpdated.getStateAction().equals(String.valueOf(EventStateAction.CANCEL_REVIEW_EVENT)))) {
+                    || (eventUpdated.getStateAction().equals(String.valueOf(EventStateAction.CANCEL_REVIEW)))) {
                 event.setState(String.valueOf(EventStates.CANCELED));
             }
 
