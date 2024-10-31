@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.common.config.ConnectStatsServer;
 import ru.practicum.common.constants.Constants;
+import ru.practicum.common.utilities.Utilities;
 import ru.practicum.events.dto.EventResponse;
 import ru.practicum.events.dto.EventResponseShort;
 import ru.practicum.events.mapper.EventsMapper;
@@ -76,18 +77,10 @@ public class EventPublicServiceImpl implements EventPublicService {
                 Constants.defaultEndTime, ConnectStatsServer.prepareUris(eventsIds),
                 true, statisticClient);
 
-        for (int i = 0; i < events.size(); i++) {
-            if ((!views.isEmpty()) && (views.get(i) != 0)) {
-                events.get(i).setViews(views.get(i));
-            } else {
-                events.get(i).setViews(0L);
-            }
-            events.get(i)
-                    .setConfirmedRequests(confirmedRequestsByEvents
-                            .getOrDefault(events.get(i).getId(), 0L));
-        }
-        return events;
+        List<? extends EventResponseShort> eventsForResp =
+                Utilities.addViewsAndConfirmedRequests(events, confirmedRequestsByEvents, views);
 
+        return Utilities.checkTypes(eventsForResp, EventResponseShort.class);
     }
 
     @Override

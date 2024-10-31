@@ -9,7 +9,9 @@ import ru.practicum.categories.model.Category;
 import ru.practicum.categories.repository.CategoriesRepository;
 import ru.practicum.common.config.ConnectStatsServer;
 import ru.practicum.common.constants.Constants;
+import ru.practicum.common.utilities.Utilities;
 import ru.practicum.events.dto.EventResponse;
+import ru.practicum.events.dto.EventResponseShort;
 import ru.practicum.events.dto.EventUpdated;
 import ru.practicum.events.mapper.EventsMapper;
 import ru.practicum.events.model.Event;
@@ -116,18 +118,9 @@ public class EventsAdminServiceImpl implements EventsAdminService {
                 Constants.defaultEndTime,
                 ConnectStatsServer.prepareUris(eventsIds), true, statisticClient);
 
-        for (int i = 0; i < eventRespFulls.size(); i++) {
-
-            if ((!views.isEmpty()) && (views.get(i) != 0)) {
-                eventRespFulls.get(i).setViews(views.get(i));
-            } else {
-                eventRespFulls.get(i).setViews(0L);
-            }
-            eventRespFulls.get(i)
-                    .setConfirmedRequests(confirmedRequestsByEvents
-                            .getOrDefault(eventRespFulls.get(i).getId(), 0L));
-        }
-        return eventRespFulls;
+        List<? extends EventResponseShort> events =
+                Utilities.addViewsAndConfirmedRequests(eventRespFulls, confirmedRequestsByEvents, views);
+        return Utilities.checkTypes(events, EventResponse.class);
     }
 
     private void addLocation(Location location) {

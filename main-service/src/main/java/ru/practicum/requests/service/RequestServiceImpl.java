@@ -152,7 +152,7 @@ public class RequestServiceImpl implements RequestService {
         Optional<Requests> request = requestRepository.findById(requestId);
 
         if (request.isEmpty()) {
-            log.warn("Attempt to get unknown events");
+            log.warn("Attempt to get unknown event");
             throw new NotFoundException("Request with id = " + request + " was not found");
         }
         return request.get();

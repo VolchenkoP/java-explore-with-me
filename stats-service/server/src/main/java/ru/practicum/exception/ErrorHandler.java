@@ -2,6 +2,7 @@ package ru.practicum.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -22,5 +23,11 @@ public class ErrorHandler {
     public ErrorResponse handleValidationException(ValidationException e) {
         log.error("Ошибка при валидации данных");
         return new ErrorResponse("Данные не прошли валидацию", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handlerMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
+        return new ErrorResponse("Bad input data", e.getMessage());
     }
 }

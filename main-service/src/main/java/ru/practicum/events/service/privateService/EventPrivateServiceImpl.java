@@ -9,6 +9,7 @@ import ru.practicum.categories.model.Category;
 import ru.practicum.categories.repository.CategoriesRepository;
 import ru.practicum.common.config.ConnectStatsServer;
 import ru.practicum.common.constants.Constants;
+import ru.practicum.common.utilities.Utilities;
 import ru.practicum.events.dto.EventRequest;
 import ru.practicum.events.dto.EventResponse;
 import ru.practicum.events.dto.EventResponseShort;
@@ -99,18 +100,11 @@ public class EventPrivateServiceImpl implements EventPrivateService {
         List<Long> views = ConnectStatsServer.getViews(Constants.defaultStartTime, Constants.defaultEndTime,
                 ConnectStatsServer.prepareUris(eventIds), true, statisticClient);
 
-        for (int i = 0; i < events.size(); i++) {
+        List<? extends EventResponseShort> eventsForResp =
+                Utilities.addViewsAndConfirmedRequests(events, confirmedRequestsByEvents, views);
 
-            if ((!views.isEmpty()) && (views.get(i) != 0)) {
-                events.get(i).setViews(views.get(i));
-            } else {
-                events.get(i).setViews(0L);
-            }
-            events.get(i)
-                    .setConfirmedRequests(confirmedRequestsByEvents
-                            .getOrDefault(events.get(i).getId(), 0L));
-        }
-        return events;
+        return Utilities.checkTypes(eventsForResp,
+                EventResponseShort.class);
     }
 
     @Override
@@ -232,7 +226,6 @@ public class EventPrivateServiceImpl implements EventPrivateService {
         }
     }
 
-    //Two pointers to checking request`s status
     private void checkRequestStatus(List<Requests> request) {
         int leftIdx = 0;
         int rightIdx = request.size() - 1;
@@ -299,7 +292,7 @@ public class EventPrivateServiceImpl implements EventPrivateService {
         if (!(event.getState().equals(String.valueOf(EventStates.PENDING)))
                 && !(event.getState().equals(String.valueOf(EventStates.CANCELED)))) {
             log.warn("Update is prohibited. event stat: {}", event.getState());
-            throw new ConflictException("States must be" + EventStates.PENDING + " or " + EventStates.CANCELED);
+            throw new ConflictException("States must be " + EventStates.PENDING + " or " + EventStates.CANCELED);
         }
     }
 }

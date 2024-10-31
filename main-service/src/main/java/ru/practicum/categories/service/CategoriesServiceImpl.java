@@ -6,7 +6,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.categories.dto.CategoryDto;
 import ru.practicum.categories.mapper.CategoriesMapper;
 import ru.practicum.categories.model.Category;
@@ -20,28 +19,24 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class CategoriesServiceImpl implements CategoriesService {
 
     private final CategoriesRepository repository;
     private final CategoriesMapper mapper;
 
     @Override
-    @Transactional
     public CategoryDto addCategory(CategoryDto categoryDto) {
         return mapper.toDto(repository.save(mapper.toEntity(categoryDto)));
     }
 
     @Override
-    @Transactional
     public CategoryDto updateCategory(CategoryDto categoryDto, int categoryId) {
         Category updatingCategory = validateCategory(categoryId);
         updatingCategory.setName(categoryDto.getName());
-        return mapper.toDto(updatingCategory);
+        return mapper.toDto(repository.save(updatingCategory));
     }
 
     @Override
-    @Transactional
     public void deleteCategory(int categoryId) {
         validateCategory(categoryId);
         repository.deleteById(categoryId);
