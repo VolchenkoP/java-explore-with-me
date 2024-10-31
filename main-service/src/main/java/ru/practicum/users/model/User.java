@@ -25,12 +25,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Email
-    @NotBlank
+    @Email(message = "not correct email")
+    @NotBlank(message = "empty email")
     @Length(min = 6, max = 254)
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "empty name")
     @Length(min = 2, max = 250)
     private String name;
 }

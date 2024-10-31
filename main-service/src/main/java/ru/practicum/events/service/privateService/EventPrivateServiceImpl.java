@@ -13,7 +13,7 @@ import ru.practicum.common.utilities.Utilities;
 import ru.practicum.events.dto.EventRequest;
 import ru.practicum.events.dto.EventResponse;
 import ru.practicum.events.dto.EventResponseShort;
-import ru.practicum.events.dto.EventUpdated;
+import ru.practicum.events.dto.EventUpdate;
 import ru.practicum.events.mapper.EventsMapper;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.EventStates;
@@ -23,9 +23,9 @@ import ru.practicum.events.repository.LocationRepository;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.requests.dto.EventIdByRequestsCount;
-import ru.practicum.requests.dto.RequestConfirm;
 import ru.practicum.requests.dto.RequestDto;
 import ru.practicum.requests.dto.RequestResponse;
+import ru.practicum.requests.dto.RequestsForConfirmation;
 import ru.practicum.requests.mapper.RequestsMapper;
 import ru.practicum.requests.model.RequestStatus;
 import ru.practicum.requests.model.Requests;
@@ -125,7 +125,7 @@ public class EventPrivateServiceImpl implements EventPrivateService {
     }
 
     @Override
-    public EventRequest updateUsersEvent(long userId, long eventId, EventUpdated eventUpdate) {
+    public EventRequest updateUsersEvent(long userId, long eventId, EventUpdate eventUpdate) {
         Event updatingEvent = validateAndGetEvent(eventId);
         checkAbilityToUpdate(updatingEvent);
 
@@ -152,7 +152,7 @@ public class EventPrivateServiceImpl implements EventPrivateService {
     }
 
     @Override
-    public RequestResponse approveRequests(RequestConfirm requestsForConfirmation,
+    public RequestResponse approveRequests(RequestsForConfirmation requestsForConfirmation,
                                            long userId,
                                            long eventId) {
         Event event = validateAndGetEvent(eventId); //checking event availability

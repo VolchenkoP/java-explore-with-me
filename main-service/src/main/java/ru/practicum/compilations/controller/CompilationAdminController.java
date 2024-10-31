@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.compilations.dto.CompilationRequest;
 import ru.practicum.compilations.dto.CompilationResponse;
-import ru.practicum.compilations.dto.CompilationUpdated;
+import ru.practicum.compilations.dto.CompilationUpdate;
 import ru.practicum.compilations.service.adminService.CompilationAdminService;
 
 @RestController
@@ -35,7 +35,7 @@ public class CompilationAdminController {
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public CompilationResponse updateCompilation(@PathVariable("id") int id,
-                                                 @Valid @RequestBody CompilationUpdated compilationUpdate) {
+                                                 @Valid @RequestBody CompilationUpdate compilationUpdate) {
         log.info("CompilationAdminController, updateCompilation, compId: {}, compilationRequest: {}",
                 id, compilationUpdate);
         return compilationService.updateCompilation(id, compilationUpdate);
@@ -47,5 +47,4 @@ public class CompilationAdminController {
         log.info("CompilationAdminController, deleteCompilation, id: {}", id);
         compilationService.deleteCompilation(id);
     }
-
 }

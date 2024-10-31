@@ -19,35 +19,35 @@ public class EventRequest {
 
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "empty annotation")
     @Length(min = 20, max = 2000)
     private String annotation;
 
     @NotNull
     private Integer category;
 
-    @NotBlank
+    @NotBlank(message = "empty description")
     @Length(min = 20, max = 7000)
     private String description;
 
     private Long initiator;
 
-    @NotNull
-    @FutureOrPresent
+    @NotNull(message = "date id null")
+    @FutureOrPresent(message = "date in past")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Constants.DATA_PATTERN)
     private LocalDateTime eventDate;
 
-    @NotNull
+    @NotNull(message = "location is null")
     private Location location;
 
     private Boolean paid;
 
-    @Min(value = 0)
+    @Min(value = 0, message = "participantLimit is null")
     private Integer participantLimit;
 
     private Boolean requestModeration;
 
-    @NotBlank
+    @NotBlank(message = "title is null")
     @Length(min = 3, max = 120)
     private String title;
 

@@ -19,9 +19,9 @@ public class Location {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "lat is null")
     private String lat;
 
-    @NotBlank
+    @NotBlank(message = "lon is null")
     private String lon;
 }

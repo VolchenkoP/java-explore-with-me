@@ -6,7 +6,7 @@ import ru.practicum.categories.model.Category;
 import ru.practicum.events.dto.EventRequest;
 import ru.practicum.events.dto.EventResponse;
 import ru.practicum.events.dto.EventResponseShort;
-import ru.practicum.events.dto.EventUpdated;
+import ru.practicum.events.dto.EventUpdate;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.EventStateAction;
 import ru.practicum.events.model.EventStates;
@@ -24,7 +24,7 @@ public interface EventsMapper {
     Event toEntity(EventRequest request);
 
     @Mapping(target = "category", source = "event.category.id")
-    @Mapping(target = "initiator", source = "event.initiator.id")
+    @Mapping(target = "initiator", source = "event.id")
     EventRequest toRequest(Event event);
 
     @Mapping(target = "confirmedRequests", ignore = true)
@@ -35,60 +35,60 @@ public interface EventsMapper {
     @Mapping(target = "views", ignore = true)
     EventResponse toResponse(Event event);
 
-    default Event updatingEvent(Event event, EventUpdated eventUpdated, Category category) {
+    default Event updatingEvent(Event event, EventUpdate eventUpdate, Category category) {
 
-        if (eventUpdated.getId() != null) {
-            event.setId(eventUpdated.getId());
+        if (eventUpdate.getId() != null) {
+            event.setId(eventUpdate.getId());
         }
 
-        if (eventUpdated.getAnnotation() != null) {
-            event.setAnnotation(eventUpdated.getAnnotation());
+        if (eventUpdate.getAnnotation() != null) {
+            event.setAnnotation(eventUpdate.getAnnotation());
         }
 
-        if (eventUpdated.getCategory() != null) {
+        if (eventUpdate.getCategory() != null) {
             event.setCategory(category);
         }
 
-        if (eventUpdated.getDescription() != null) {
-            event.setDescription(eventUpdated.getDescription());
+        if (eventUpdate.getDescription() != null) {
+            event.setDescription(eventUpdate.getDescription());
         }
 
-        if (eventUpdated.getLocation() != null) {
-            event.setLocation(eventUpdated.getLocation());
+        if (eventUpdate.getLocation() != null) {
+            event.setLocation(eventUpdate.getLocation());
         }
 
-        if (eventUpdated.getPaid() != null) {
-            event.setPaid(eventUpdated.getPaid());
+        if (eventUpdate.getPaid() != null) {
+            event.setPaid(eventUpdate.getPaid());
         }
 
-        if (eventUpdated.getParticipantLimit() != null) {
-            event.setParticipantLimit(eventUpdated.getParticipantLimit());
+        if (eventUpdate.getParticipantLimit() != null) {
+            event.setParticipantLimit(eventUpdate.getParticipantLimit());
         }
 
-        if (eventUpdated.getRequestModeration() != null) {
-            event.setRequestModeration(eventUpdated.getRequestModeration());
+        if (eventUpdate.getRequestModeration() != null) {
+            event.setRequestModeration(eventUpdate.getRequestModeration());
         }
 
-        if (eventUpdated.getTitle() != null) {
-            event.setTitle(eventUpdated.getTitle());
+        if (eventUpdate.getTitle() != null) {
+            event.setTitle(eventUpdate.getTitle());
         }
 
-        if (eventUpdated.getCreatedOn() != null) {
-            event.setCreatedOn(eventUpdated.getCreatedOn());
+        if (eventUpdate.getCreatedOn() != null) {
+            event.setCreatedOn(eventUpdate.getCreatedOn());
         }
 
-        if (eventUpdated.getStateAction() != null) {
-            if (eventUpdated.getStateAction().equals(String.valueOf(EventStateAction.PUBLISH_EVENT))) {
+        if (eventUpdate.getStateAction() != null) {
+            if (eventUpdate.getStateAction().equals(String.valueOf(EventStateAction.PUBLISH_EVENT))) {
                 event.setState(String.valueOf(EventStates.PUBLISHED));
                 event.setPublishedOn(LocalDateTime.now());
             }
 
-            if ((eventUpdated.getStateAction().equals(String.valueOf(EventStateAction.REJECT_EVENT)))
-                    || (eventUpdated.getStateAction().equals(String.valueOf(EventStateAction.CANCEL_REVIEW)))) {
+            if ((eventUpdate.getStateAction().equals(String.valueOf(EventStateAction.REJECT_EVENT)))
+                    || (eventUpdate.getStateAction().equals(String.valueOf(EventStateAction.CANCEL_REVIEW)))) {
                 event.setState(String.valueOf(EventStates.CANCELED));
             }
 
-            if (eventUpdated.getStateAction().equals(String.valueOf(EventStateAction.SEND_TO_REVIEW))) {
+            if (eventUpdate.getStateAction().equals(String.valueOf(EventStateAction.SEND_TO_REVIEW))) {
                 event.setState(String.valueOf(EventStates.PENDING));
             }
 

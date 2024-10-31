@@ -14,6 +14,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CompositeKeyForEventByCompilation implements Serializable {
+
     private Integer compilationId;
     private Long eventId;
 }

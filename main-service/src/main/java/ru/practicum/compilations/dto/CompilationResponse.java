@@ -15,11 +15,11 @@ public class CompilationResponse {
 
     private Integer id;
 
-    @NotBlank
+    @NotBlank(message = "empty title")
     @Length(max = 50)
     private String title;
 
-    @NotNull
+    @NotNull(message = "pinned must not be null")
     private Boolean pinned;
 
     private List<EventResponseShort> events;

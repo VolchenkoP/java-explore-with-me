@@ -12,7 +12,7 @@ import ru.practicum.common.constants.Constants;
 import ru.practicum.common.utilities.Utilities;
 import ru.practicum.events.dto.EventResponse;
 import ru.practicum.events.dto.EventResponseShort;
-import ru.practicum.events.dto.EventUpdated;
+import ru.practicum.events.dto.EventUpdate;
 import ru.practicum.events.mapper.EventsMapper;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.EventStates;
@@ -47,7 +47,7 @@ public class EventsAdminServiceImpl implements EventsAdminService {
     private final EventsMapper mapper;
 
     @Override
-    public EventResponse adminsUpdate(EventUpdated eventUpdate, long eventId) {
+    public EventResponse adminsUpdate(EventUpdate eventUpdate, long eventId) {
         Event event = validateAndGetEvent(eventId);
 
         checkAbilityToUpdate(event);
@@ -112,7 +112,8 @@ public class EventsAdminServiceImpl implements EventsAdminService {
         Map<Long, Long> confirmedRequestsByEvents = requestRepository
                 .countByEventIdInAndStatusGroupByEvent(eventsIds, String.valueOf(RequestStatus.CONFIRMED))
                 .stream()
-                .collect(Collectors.toMap(EventIdByRequestsCount::getEvent, EventIdByRequestsCount::getCount));
+                .collect(Collectors.toMap(EventIdByRequestsCount::getEvent,
+                        EventIdByRequestsCount::getCount));
 
         List<Long> views = ConnectStatsServer.getViews(Constants.defaultStartTime,
                 Constants.defaultEndTime,
@@ -149,7 +150,7 @@ public class EventsAdminServiceImpl implements EventsAdminService {
         if (event.getState().equals(String.valueOf(EventStates.PUBLISHED)) ||
                 event.getState().equals(String.valueOf(EventStates.CANCELED))) {
             log.warn("Update is prohibited. event stat: {}", event.getState());
-            throw new ConflictException("States must be" + EventStates.PENDING + " or " + EventStates.CANCELED);
+            throw new ConflictException("States must be " + EventStates.PENDING + " or " + EventStates.CANCELED);
         }
     }
 

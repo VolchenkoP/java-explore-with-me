@@ -32,10 +32,10 @@ public class CategoriesAdminController {
 
     @PatchMapping("/{categoryId}")
     @ResponseStatus(HttpStatus.OK)
-    public CategoryDto updateCategory(@Valid @RequestBody CategoryDto dto,
+    public CategoryDto updateCategory(@Valid @RequestBody CategoryDto categoryDto,
                                       @PathVariable(value = "categoryId") int categoryId) {
         log.info("");
-        return service.updateCategory(dto, categoryId);
+        return service.updateCategory(categoryDto, categoryId);
     }
 
     @DeleteMapping("/{categoryId}")
