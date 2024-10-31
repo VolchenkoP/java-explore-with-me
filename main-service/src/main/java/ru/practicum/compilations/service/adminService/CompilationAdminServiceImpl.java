@@ -111,4 +111,3 @@ public class CompilationAdminServiceImpl implements CompilationAdminService {
         return compilationRepository.findById(id).orElseThrow();
     }
 }
-}
