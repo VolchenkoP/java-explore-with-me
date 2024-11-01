@@ -22,18 +22,17 @@ import java.util.stream.Collectors;
 public class CategoriesServiceImpl implements CategoriesService {
 
     private final CategoriesRepository repository;
-    private final CategoriesMapper mapper;
 
     @Override
     public CategoryDto addCategory(CategoryDto categoryDto) {
-        return mapper.toDto(repository.save(mapper.toEntity(categoryDto)));
+        return CategoriesMapper.toDto(repository.save(CategoriesMapper.toEntity(categoryDto)));
     }
 
     @Override
     public CategoryDto updateCategory(CategoryDto categoryDto, int categoryId) {
         Category updatingCategory = validateCategory(categoryId);
         updatingCategory.setName(categoryDto.getName());
-        return mapper.toDto(repository.save(updatingCategory));
+        return CategoriesMapper.toDto(repository.save(updatingCategory));
     }
 
     @Override
@@ -49,14 +48,14 @@ public class CategoriesServiceImpl implements CategoriesService {
         Pageable pageable = PageRequest.of(startPage, size, sortById);
         return repository.findAll(pageable)
                 .stream()
-                .map(mapper::toDto)
+                .map(CategoriesMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public CategoryDto getCategoryById(int categoryId) {
         Category category = validateCategory(categoryId);
-        return mapper.toDto(category);
+        return CategoriesMapper.toDto(category);
     }
 
     private Category validateCategory(int categoryId) {
