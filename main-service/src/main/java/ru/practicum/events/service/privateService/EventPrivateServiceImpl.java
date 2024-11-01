@@ -14,7 +14,7 @@ import ru.practicum.events.dto.EventRequest;
 import ru.practicum.events.dto.EventResponse;
 import ru.practicum.events.dto.EventResponseShort;
 import ru.practicum.events.dto.EventUpdate;
-import ru.practicum.events.mapper.EventsMapper;
+import ru.practicum.events.mapper.EventMapper;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.EventStates;
 import ru.practicum.events.model.Location;
@@ -26,7 +26,7 @@ import ru.practicum.requests.dto.EventIdByRequestsCount;
 import ru.practicum.requests.dto.RequestDto;
 import ru.practicum.requests.dto.RequestResponse;
 import ru.practicum.requests.dto.RequestsForConfirmation;
-import ru.practicum.requests.mapper.RequestsMapper;
+import ru.practicum.requests.mapper.RequestMapper;
 import ru.practicum.requests.model.RequestStatus;
 import ru.practicum.requests.model.Requests;
 import ru.practicum.requests.repository.RequestsRepository;
@@ -52,9 +52,6 @@ public class EventPrivateServiceImpl implements EventPrivateService {
     private final LocationRepository locationRepository;
     private final RequestsRepository requestRepository;
     private final StatisticsClient statisticClient;
-    private final EventsMapper eventsMapper;
-    private final RequestsMapper requestsMapper;
-
 
     @Override
     public EventRequest createEvent(EventRequest eventRequest, long userId) {
@@ -70,14 +67,14 @@ public class EventPrivateServiceImpl implements EventPrivateService {
 
         validateEventDate(eventRequest.getEventDate());
         addLocation(eventRequest.getLocation()); //Adding locations to database because location is separated entity
-        Event addingEvent = eventsMapper.toEntity(eventRequest);
+        Event addingEvent = EventMapper.toEntity(eventRequest);
         addingEvent.setInitiator(validateAndGetUser(userId));
         addingEvent.setCategory(validateAndGetCategory(eventRequest.getCategory()));
         addingEvent.setCreatedOn(LocalDateTime.now());
         addingEvent.setState(String.valueOf(EventStates.PENDING));
 
         Event saved = eventRepository.save(addingEvent);
-        return eventsMapper.toRequest(saved);
+        return EventMapper.toRequest(saved);
     }
 
     @Override
@@ -87,7 +84,7 @@ public class EventPrivateServiceImpl implements EventPrivateService {
 
         List<EventResponseShort> events = eventRepository.findByInitiatorId(userId, pageable)
                 .stream()
-                .map(eventsMapper::toResponseShort)
+                .map(EventMapper::toResponseShort)
                 .toList();
 
         List<Long> eventIds = events.stream().map(EventResponseShort::getId).toList();
@@ -112,7 +109,7 @@ public class EventPrivateServiceImpl implements EventPrivateService {
         Event event = validateAndGetEvent(eventId);
         long confirmedRequests = requestRepository
                 .countByEventIdAndStatus(eventId, String.valueOf(RequestStatus.CONFIRMED));
-        EventResponse eventRespFull = eventsMapper.toResponse(event);
+        EventResponse eventRespFull = EventMapper.toResponse(event);
         eventRespFull.setConfirmedRequests(confirmedRequests);
         List<Long> views = ConnectStatsServer.getViews(Constants.defaultStartTime,
                 Constants.defaultEndTime, path, true, statisticClient);
@@ -138,8 +135,8 @@ public class EventPrivateServiceImpl implements EventPrivateService {
             category = validateAndGetCategory(eventUpdate.getCategory());
         }
 
-        Event updatedEvent = eventRepository.save(eventsMapper.updatingEvent(updatingEvent, eventUpdate, category));
-        return eventsMapper.toRequest(updatedEvent);
+        Event updatedEvent = eventRepository.save(EventMapper.updatingEvent(updatingEvent, eventUpdate, category));
+        return EventMapper.toRequest(updatedEvent);
     }
 
     @Override
@@ -147,7 +144,7 @@ public class EventPrivateServiceImpl implements EventPrivateService {
         validateAndGetEvent(eventId);
         return requestRepository.findByEventId(eventId)
                 .stream()
-                .map(requestsMapper::toRequestDto)
+                .map(RequestMapper::toRequestDto)
                 .collect(Collectors.toList());
     }
 
@@ -170,7 +167,7 @@ public class EventPrivateServiceImpl implements EventPrivateService {
             List<RequestDto> approvedRequest = requestRepository.saveAll(setStatusToRequests(RequestStatus
                             .valueOf(requestsForConfirmation.getStatus()), requests))
                     .stream()
-                    .map(requestsMapper::toRequestDto)
+                    .map(RequestMapper::toRequestDto)
                     .toList();
             RequestResponse response = RequestResponse.builder().build();
             if (requestsForConfirmation.getStatus().equals(String.valueOf(RequestStatus.REJECTED))) {
@@ -190,13 +187,13 @@ public class EventPrivateServiceImpl implements EventPrivateService {
         List<RequestDto> confirmed = requestRepository.saveAll(setStatusToRequests(RequestStatus
                         .valueOf(requestsForConfirmation.getStatus()), requests.subList(0, freeSlots)))
                 .stream()
-                .map(requestsMapper::toRequestDto)
+                .map(RequestMapper::toRequestDto)
                 .toList();
 
         List<RequestDto> rejected = requestRepository.saveAll(setStatusToRequests(RequestStatus.REJECTED,
                         requests.subList(freeSlots, requests.size())))
                 .stream()
-                .map(requestsMapper::toRequestDto)
+                .map(RequestMapper::toRequestDto)
                 .toList();
 
         return RequestResponse

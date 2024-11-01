@@ -9,7 +9,7 @@ import ru.practicum.events.repository.EventsRepository;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.requests.dto.RequestDto;
-import ru.practicum.requests.mapper.RequestsMapper;
+import ru.practicum.requests.mapper.RequestMapper;
 import ru.practicum.requests.model.RequestStatus;
 import ru.practicum.requests.model.Requests;
 import ru.practicum.requests.repository.RequestsRepository;
@@ -30,7 +30,6 @@ public class RequestServiceImpl implements RequestService {
     private final RequestsRepository requestRepository;
     private final UserRepository userRepository;
     private final EventsRepository eventRepository;
-    private final RequestsMapper requestsMapper;
 
     private static void sortByRequesterIdAndEventId(List<Requests> list) {
         list.sort((Requests req1, Requests req2) -> {
@@ -97,14 +96,14 @@ public class RequestServiceImpl implements RequestService {
             addingRequest.setStatus(String.valueOf(RequestStatus.CONFIRMED));
         }
 
-        return requestsMapper.toRequestDto(requestRepository.save(addingRequest));
+        return RequestMapper.toRequestDto(requestRepository.save(addingRequest));
     }
 
     @Override
     public RequestDto cancelRequest(long requestId, long userId) {
         Requests updatingRequest = validateRequest(requestId);
         updatingRequest.setStatus(String.valueOf(RequestStatus.CANCELED));
-        return requestsMapper.toRequestDto(requestRepository.save(updatingRequest));
+        return RequestMapper.toRequestDto(requestRepository.save(updatingRequest));
     }
 
     @Override
@@ -112,7 +111,7 @@ public class RequestServiceImpl implements RequestService {
         return requestRepository
                 .findByRequesterId(userId)
                 .stream()
-                .map(requestsMapper::toRequestDto)
+                .map(RequestMapper::toRequestDto)
                 .collect(Collectors.toSet());
     }
 

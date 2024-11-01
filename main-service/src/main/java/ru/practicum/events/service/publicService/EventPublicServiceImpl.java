@@ -10,7 +10,7 @@ import ru.practicum.common.constants.Constants;
 import ru.practicum.common.utilities.Utilities;
 import ru.practicum.events.dto.EventResponse;
 import ru.practicum.events.dto.EventResponseShort;
-import ru.practicum.events.mapper.EventsMapper;
+import ru.practicum.events.mapper.EventMapper;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.EventStates;
 import ru.practicum.events.repository.EventsRepository;
@@ -35,7 +35,6 @@ public class EventPublicServiceImpl implements EventPublicService {
     private final EventsRepository eventRepository;
     private final RequestsRepository requestRepository;
     private final StatisticsClient statisticClient;
-    private final EventsMapper eventsMapper;
 
     @Override
     public Collection<EventResponseShort> searchEvents(String text, List<Integer> categories, Boolean paid,
@@ -61,7 +60,7 @@ public class EventPublicServiceImpl implements EventPublicService {
         List<EventResponseShort> events = eventRepository
                 .searchEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, pageable)
                 .stream()
-                .map(eventsMapper::toResponseShort)
+                .map(EventMapper::toResponseShort)
                 .toList();
 
         List<Long> eventsIds = events.stream()
@@ -94,7 +93,7 @@ public class EventPublicServiceImpl implements EventPublicService {
         long confirmedRequests = requestRepository.countByEventIdAndStatus(eventId,
                 String.valueOf(RequestStatus.CONFIRMED));
 
-        EventResponse eventFull = eventsMapper.toResponse(event);
+        EventResponse eventFull = EventMapper.toResponse(event);
         eventFull.setConfirmedRequests(confirmedRequests);
         List<Long> views = ConnectStatsServer.getViews(Constants.defaultStartTime,
                 Constants.defaultEndTime, path,
