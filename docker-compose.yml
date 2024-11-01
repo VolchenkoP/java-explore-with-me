@@ -1,7 +1,8 @@
+version: "3.1"
 services:
   stats-server:
-    build: stats-service/server
-    image: stats-service/server
+    build: stats/stats-server
+    image: stats/stats-server
     container_name: statsApp
     ports:
       - "9090:9090"
@@ -28,6 +29,7 @@ services:
       timeout: 5s
       interval: 5s
       retries: 10
+
 
   main-server:
     build: main-service
@@ -61,3 +63,5 @@ services:
       timeout: 5s
       interval: 5s
       retries: 10
+
+
