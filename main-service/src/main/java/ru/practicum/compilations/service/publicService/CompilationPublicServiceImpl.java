@@ -14,7 +14,7 @@ import ru.practicum.compilations.repository.EventByCompilationRepository;
 import ru.practicum.events.dto.EventResponseShort;
 import ru.practicum.events.mapper.EventMapper;
 import ru.practicum.events.model.Event;
-import ru.practicum.events.repository.EventsRepository;
+import ru.practicum.events.repository.EventRepository;
 import ru.practicum.exception.NotFoundException;
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class CompilationPublicServiceImpl implements CompilationPublicService {
 
     private final CompilationRepository compilationRepository;
-    private final EventsRepository eventRepository;
+    private final EventRepository eventRepository;
     private final EventByCompilationRepository eventByCompilationRepository;
 
     @Override

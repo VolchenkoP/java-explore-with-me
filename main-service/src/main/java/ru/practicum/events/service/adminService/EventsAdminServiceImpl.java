@@ -17,14 +17,14 @@ import ru.practicum.events.mapper.EventMapper;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.EventStates;
 import ru.practicum.events.model.Location;
-import ru.practicum.events.repository.EventsRepository;
+import ru.practicum.events.repository.EventRepository;
 import ru.practicum.events.repository.LocationRepository;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.ValidationException;
 import ru.practicum.requests.dto.EventIdByRequestsCount;
 import ru.practicum.requests.model.RequestStatus;
-import ru.practicum.requests.repository.RequestsRepository;
+import ru.practicum.requests.repository.RequestRepository;
 import ru.practicum.statisticsClient.StatisticsClient;
 
 import java.time.LocalDateTime;
@@ -39,19 +39,19 @@ import java.util.stream.Collectors;
 @Slf4j
 public class EventsAdminServiceImpl implements EventsAdminService {
 
-    private final EventsRepository eventRepository;
+    private final EventRepository eventRepository;
     private final LocationRepository locationRepository;
     private final CategoriesRepository categoriesRepository;
-    private final RequestsRepository requestRepository;
+    private final RequestRepository requestRepository;
     private final StatisticsClient statisticClient;
 
     @Override
     public EventResponse adminsUpdate(EventUpdate eventUpdate, long eventId) {
-        Event event = validateAndGetEvent(eventId);
+        Event updatingEvent = validateAndGetEvent(eventId);
 
-        checkAbilityToUpdate(event);
+        checkAbilityToUpdate(updatingEvent);
 
-        Category category = event.getCategory();
+        Category category = updatingEvent.getCategory();
 
         if (eventUpdate.getCategory() != null) {
             category = validateAndGetCategory(eventUpdate.getCategory());
@@ -61,7 +61,8 @@ public class EventsAdminServiceImpl implements EventsAdminService {
             addLocation(eventUpdate.getLocation());
         }
 
-        Event updatedEvent = eventRepository.save(EventMapper.updatingEvent(event, eventUpdate, category));
+        Event updatedEvent = eventRepository.save(EventMapper
+                .updatingEvent(updatingEvent, eventUpdate, category));
         long confirmedRequests = requestRepository
                 .countByEventIdAndStatus(eventId, String.valueOf(RequestStatus.CONFIRMED));
         EventResponse eventFull = EventMapper.toResponse(updatedEvent);
@@ -111,9 +112,7 @@ public class EventsAdminServiceImpl implements EventsAdminService {
         Map<Long, Long> confirmedRequestsByEvents = requestRepository
                 .countByEventIdInAndStatusGroupByEvent(eventsIds, String.valueOf(RequestStatus.CONFIRMED))
                 .stream()
-                .collect(Collectors.toMap(EventIdByRequestsCount::getEvent,
-                        EventIdByRequestsCount::getCount));
-        System.out.println(confirmedRequestsByEvents.keySet());
+                .collect(Collectors.toMap(EventIdByRequestsCount::getEvent, EventIdByRequestsCount::getCount));
 
         List<Long> views = ConnectStatsServer.getViews(Constants.defaultStartTime,
                 Constants.defaultEndTime,
@@ -121,8 +120,6 @@ public class EventsAdminServiceImpl implements EventsAdminService {
 
         List<? extends EventResponseShort> events =
                 Utilities.addViewsAndConfirmedRequests(eventRespFulls, confirmedRequestsByEvents, views);
-        System.out.println(events);
-        System.out.println(events.get(0).getConfirmedRequests());
         return Utilities.checkTypes(events, EventResponse.class);
     }
 
@@ -152,7 +149,7 @@ public class EventsAdminServiceImpl implements EventsAdminService {
         if (event.getState().equals(String.valueOf(EventStates.PUBLISHED)) ||
                 event.getState().equals(String.valueOf(EventStates.CANCELED))) {
             log.warn("Update is prohibited. event stat: {}", event.getState());
-            throw new ConflictException("States must be " + EventStates.PENDING + " or " + EventStates.CANCELED);
+            throw new ConflictException("States must be" + EventStates.PENDING + " or " + EventStates.CANCELED);
         }
     }
 
