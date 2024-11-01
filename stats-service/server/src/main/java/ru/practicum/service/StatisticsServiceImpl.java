@@ -7,6 +7,7 @@ import ru.practicum.StatisticsDto;
 import ru.practicum.StatisticsResponse;
 import ru.practicum.constants.Constants;
 import ru.practicum.exception.NotFoundException;
+import ru.practicum.exception.ValidationException;
 import ru.practicum.mapper.StatisticsMapper;
 import ru.practicum.model.App;
 import ru.practicum.model.Statistics;
@@ -30,9 +31,14 @@ public class StatisticsServiceImpl implements StatisticsService {
     public StatisticsDto createStatistics(StatisticsDto dto) {
         App app = validationApp(dto.getApp());
         Statistics statistics = mapper.toEntity(dto);
-        statistics.setApp(app);
+        Statistics newStat = Statistics.builder()
+                .app(app)
+                .uri(statistics.getUri())
+                .ip(statistics.getIp())
+                .timestamp(statistics.getTimestamp())
+                .build();
         log.info("Данные успешно добавлены в статистику");
-        return mapper.toDto(statisticsRepository.save(statistics));
+        return mapper.toDto(statisticsRepository.save(newStat));
     }
 
     @Override
@@ -41,6 +47,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         log.info("Параметр даты начала успешно сконвертирован");
         LocalDateTime endTime = convertStringToLocalDateTime(decoderParameters(end));
         log.info("Параметр даты окончания успешно сконвертирован");
+        validateDates(startTime, endTime);
 
         if (unique) {
             if (uris == null) {
@@ -86,5 +93,15 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     private LocalDateTime convertStringToLocalDateTime(String dateTime) {
         return LocalDateTime.parse(dateTime, Constants.DATE_FORMATTER);
+    }
+
+    private void validateDates(LocalDateTime start, LocalDateTime end) {
+        if (start == null || end == null) {
+            return;
+        }
+        if (start.isAfter(end)) {
+            log.warn("start is after end");
+            throw new ValidationException("start is after end");
+        }
     }
 }

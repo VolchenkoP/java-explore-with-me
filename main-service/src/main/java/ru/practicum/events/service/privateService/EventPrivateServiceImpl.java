@@ -94,11 +94,16 @@ public class EventPrivateServiceImpl implements EventPrivateService {
                 .stream()
                 .collect(Collectors.toMap(EventIdByRequestsCount::getEvent, EventIdByRequestsCount::getCount));
 
+        System.out.println(confirmedRequestsByEvents);
+
         List<Long> views = ConnectStatsServer.getViews(Constants.defaultStartTime, Constants.defaultEndTime,
                 ConnectStatsServer.prepareUris(eventIds), true, statisticClient);
 
         List<? extends EventResponseShort> eventsForResp =
                 Utilities.addViewsAndConfirmedRequests(events, confirmedRequestsByEvents, views);
+
+        System.out.println(eventsForResp);
+        System.out.println(eventsForResp.get(0).getConfirmedRequests());
 
         return Utilities.checkTypes(eventsForResp,
                 EventResponseShort.class);
