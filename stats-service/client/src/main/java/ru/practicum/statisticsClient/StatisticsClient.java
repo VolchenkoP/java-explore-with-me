@@ -30,8 +30,8 @@ public class StatisticsClient extends BaseClient {
 
     public ResponseEntity<List<StatisticsResponse>> getStatistics(LocalDateTime start, LocalDateTime end,
                                                                   @Nullable String uris, boolean unique) {
-        String encodedStartDate = encodeParameter(convertLocalDateTimeToString(start));
-        String encodedEndDate = encodeParameter(convertLocalDateTimeToString(end));
+        String encodedStartDate = encodeParameters(convertLocalDateTimeToString(start));
+        String encodedEndDate = encodeParameters(convertLocalDateTimeToString(end));
 
         Map<String, Object> parameters = new HashMap<>(
                 Map.of(
@@ -43,7 +43,8 @@ public class StatisticsClient extends BaseClient {
         if (uris != null) {
             parameters.put("uris", uris);
         }
-        return getList("/stats" + "?start={start}&end={end}&uris={uris}&unique={unique}", parameters,
+        return getList("/stats" + "?start={start}&end={end}&uris={uris}&unique={unique}",
+                parameters,
                 new ParameterizedTypeReference<>() {
                 });
     }
@@ -52,7 +53,7 @@ public class StatisticsClient extends BaseClient {
         return post("/hit", dto, null);
     }
 
-    private String encodeParameter(String parameter) {
+    private String encodeParameters(String parameter) {
         return URLEncoder.encode(parameter, StandardCharsets.UTF_8);
     }
 

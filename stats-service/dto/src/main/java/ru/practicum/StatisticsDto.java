@@ -12,13 +12,16 @@ import java.time.LocalDateTime;
 @Builder
 public class StatisticsDto {
 
-    @NotBlank
+    @NotBlank(message = "empty app name")
     private String app;
-    @NotBlank
+
+    @NotBlank(message = "empty uri")
     private String uri;
-    @NotBlank
+
+    @NotBlank(message = "empty ip")
     private String ip;
-    @NotNull
+
+    @NotNull(message = "time is null")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
 }

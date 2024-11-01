@@ -13,16 +13,16 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNotFoundException(NotFoundException e) {
+    public ErrorResponse handleNotFoundException(final NotFoundException e) {
         log.error("Ошибка при поиске данных");
-        return new ErrorResponse("Данные не найдены", e.getMessage());
+        return new ErrorResponse("Not found", e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationException(ValidationException e) {
+    public ErrorResponse handleValidationException(final ValidationException e) {
         log.error("Ошибка при валидации данных");
-        return new ErrorResponse("Данные не прошли валидацию", e.getMessage());
+        return new ErrorResponse("Validation exception", e.getMessage());
     }
 
     @ExceptionHandler

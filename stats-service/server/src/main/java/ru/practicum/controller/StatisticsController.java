@@ -16,6 +16,9 @@ import ru.practicum.StatisticsResponse;
 import ru.practicum.constants.Constants;
 import ru.practicum.service.StatisticsService;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -33,7 +36,9 @@ public class StatisticsController {
                                                   @RequestParam(required = false, value = "uris") List<String> uris,
                                                   @RequestParam(required = false, value = "unique") boolean unique) {
         log.info("Получение статистики по следующим параметрам: {}, {}, {}, {}.", start, end, uris, unique);
-        return service.getStatistics(start, end, uris, unique);
+        LocalDateTime startTime = convertToLocalDataTime(decodeParameters(start));
+        LocalDateTime endTime = convertToLocalDataTime(decodeParameters(end));
+        return service.getStatistics(startTime, endTime, uris, unique);
     }
 
     @PostMapping("/hit")
@@ -42,5 +47,13 @@ public class StatisticsController {
         log.info("Добалвение в статистику следующей информации: {}, {}, {}, {}.",
                 statisticsDto.getApp(), statisticsDto.getUri(), statisticsDto.getIp(), statisticsDto.getTimestamp());
         return service.createStatistics(statisticsDto);
+    }
+
+    private String decodeParameters(String parameter) {
+        return URLDecoder.decode(parameter, StandardCharsets.UTF_8);
+    }
+
+    private LocalDateTime convertToLocalDataTime(String dataTime) {
+        return LocalDateTime.parse(dataTime, Constants.DATE_FORMATTER);
     }
 }

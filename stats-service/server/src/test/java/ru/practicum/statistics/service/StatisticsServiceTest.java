@@ -30,8 +30,8 @@ public class StatisticsServiceTest {
     private static StatisticsDto statEvent3;
     private static StatisticsDto statEvent4;
     private static App mainApp;
-    private static String start = "2000-01-01 11:11:11";
-    private static String end = "3000-01-01 11:11:11";
+    private static LocalDateTime start = LocalDateTime.parse("2000-01-01 11:11:11", Constants.DATE_FORMATTER);
+    private static LocalDateTime end = LocalDateTime.parse("3000-01-01 11:11:11", Constants.DATE_FORMATTER);
     private final EntityManager em;
     private final StatisticsService statisticService;
 

@@ -6,5 +6,6 @@ import ru.practicum.model.App;
 import java.util.Optional;
 
 public interface AppRepository extends JpaRepository<App, Long> {
+
     Optional<App> findByName(String name);
 }
