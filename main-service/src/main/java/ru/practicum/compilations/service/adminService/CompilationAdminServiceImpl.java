@@ -27,7 +27,6 @@ public class CompilationAdminServiceImpl implements CompilationAdminService {
     private final CompilationRepository compilationRepository;
     private final EventByCompilationRepository eventByCompilationRepository;
     private final EventsRepository eventRepository;
-    private final CompilationMapper compilationMapper;
 
     @Override
     public CompilationResponse addCompilation(CompilationRequest compilationRequest) {
@@ -37,18 +36,15 @@ public class CompilationAdminServiceImpl implements CompilationAdminService {
 
         //Save to compilation table
         Compilation savedCompilation = compilationRepository
-                .save(compilationMapper.toEntity(compilationRequest));
+                .save(CompilationMapper.toEntity(compilationRequest));
 
         int compilationId = savedCompilation.getId(); //returned compilation_id
 
-        CompilationResponse compilationResponse = compilationMapper.toResponse(savedCompilation);
-
         if (compilationRequest.getEvents() == null) {
-            compilationResponse.setEvents(List.of());
-            return compilationResponse;
+            return CompilationMapper.toResponse(savedCompilation, List.of());
         }
-        compilationResponse.setEvents(addEventByCompilations(compilationRequest, compilationId));
-        return compilationResponse;
+        return CompilationMapper.toResponse(
+                savedCompilation, addEventByCompilations(compilationRequest, compilationId));
     }
 
     @Override
@@ -56,21 +52,18 @@ public class CompilationAdminServiceImpl implements CompilationAdminService {
         Compilation updatingCompilation = validateAndGetCompilation(id);
 
         Compilation updatedCompilation = compilationRepository
-                .save(compilationMapper.updateCompilation(
+                .save(CompilationMapper.updateCompilation(
                         updatingCompilation,
-                        compilationMapper.toEntity(compilationUpdate)
+                        CompilationMapper.toEntity(compilationUpdate)
                 ));
 
-        CompilationResponse compilationResponse = compilationMapper.toResponse(updatedCompilation);
         if (compilationUpdate.getEvents() == null) {
-            compilationResponse.setEvents(List.of());
-            return compilationResponse;
+            return CompilationMapper.toResponse(updatedCompilation, List.of());
         }
 
         deleteEventsByCompilations(id);
 
-        compilationResponse.setEvents(addEventByCompilations(compilationUpdate, id));
-        return compilationResponse;
+        return CompilationMapper.toResponse(updatedCompilation, addEventByCompilations(compilationUpdate, id));
     }
 
     @Override
