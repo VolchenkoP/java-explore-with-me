@@ -1,12 +1,12 @@
 package ru.practicum.service;
 
-import ru.practicum.StatisticsDto;
-import ru.practicum.StatisticsResponse;
+import ru.practicum.StatisticDto;
+import ru.practicum.StatisticResponse;
 
 import java.util.List;
 
 public interface StatisticsService {
-    StatisticsDto createStatistics(StatisticsDto dto);
+    StatisticDto createStatistics(StatisticDto dto);
 
-    List<StatisticsResponse> getStatistics(String start, String end, List<String> uris, boolean unique);
+    List<StatisticResponse> getStatistics(String start, String end, List<String> uris, boolean unique);
 }

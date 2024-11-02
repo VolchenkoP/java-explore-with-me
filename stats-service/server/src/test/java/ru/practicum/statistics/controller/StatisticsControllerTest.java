@@ -8,8 +8,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.StatisticsDto;
-import ru.practicum.StatisticsResponse;
+import ru.practicum.StatisticDto;
+import ru.practicum.StatisticResponse;
 import ru.practicum.constants.Constants;
 import ru.practicum.controller.StatisticsController;
 import ru.practicum.model.App;
@@ -31,8 +31,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = StatisticsController.class)
 public class StatisticsControllerTest {
 
-    private static StatisticsDto addingStatisticForEvent1;
-    private static StatisticsResponse statsForEvent1;
+    private static StatisticDto addingStatisticForEvent1;
+    private static StatisticResponse statsForEvent1;
     private static App mainApp;
     @Autowired
     private ObjectMapper mapper;
@@ -48,14 +48,14 @@ public class StatisticsControllerTest {
         mainApp.setId(1L);
         mainApp.setName("ewm-main-service");
 
-        addingStatisticForEvent1 = StatisticsDto.builder()
+        addingStatisticForEvent1 = StatisticDto.builder()
                 .app(mainApp.getName())
                 .uri("/events/1")
                 .ip("192.163.0.1")
                 .timestamp(LocalDateTime.parse("2023-10-06 22:00:23", Constants.DATE_FORMATTER))
                 .build();
 
-        statsForEvent1 = new StatisticsResponse(mainApp, "/events/1", 2L);
+        statsForEvent1 = new StatisticResponse(mainApp, "/events/1", 2L);
     }
 
     @Test

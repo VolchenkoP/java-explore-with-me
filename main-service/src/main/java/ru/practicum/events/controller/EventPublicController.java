@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.StatisticsDto;
-import ru.practicum.common.constants.Constants;
-import ru.practicum.events.dto.EventResponse;
-import ru.practicum.events.dto.EventResponseShort;
-import ru.practicum.events.service.publicService.EventPublicService;
-import ru.practicum.statisticsClient.StatisticsClient;
+import ru.practicum.StatisticDto;
+import ru.practicum.common.GeneralConstants;
+import ru.practicum.events.dto.EventRespFull;
+import ru.practicum.events.dto.EventRespShort;
+import ru.practicum.events.services.EventsServicePublic;
+import ru.practicum.statisticsClient.StatisticClient;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -33,38 +33,36 @@ import java.util.List;
 @Slf4j
 public class EventPublicController {
 
-    private final EventPublicService eventService;
-    private final StatisticsClient statisticClient;
+    private final EventsServicePublic eventService;
+    private final StatisticClient statisticClient;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Collection<EventResponseShort> searchEvents(@RequestParam(value = "text", required = false) String text,
-                                                       @RequestParam(value = "categories", required = false)
-                                                       List<Integer> categories,
-                                                       @RequestParam(value = "paid", required = false) Boolean paid,
-                                                       @RequestParam(value = "rangeStart", required = false)
-                                                       String rangeStart,
-                                                       @RequestParam(value = "rangeEnd", required = false)
-                                                       String rangeEnd,
-                                                       @RequestParam(value = "onlyAvailable", required = false,
-                                                               defaultValue = "false") boolean onlyAvailable,
-                                                       @RequestParam(value = "sort", required = false) String sort,
-                                                       @Min(0)
-                                                       @RequestParam(value = "from", defaultValue = "0") int from,
-                                                       @Min(0)
-                                                       @RequestParam(value = "size", defaultValue = "10") int size,
-                                                       HttpServletRequest httpServletRequest) {
+    public Collection<EventRespShort> searchEvents(@RequestParam(value = "text", required = false) String text,
+                                                   @RequestParam(value = "categories", required = false)
+                                                   List<Integer> categories,
+                                                   @RequestParam(value = "paid", required = false) Boolean paid,
+                                                   @RequestParam(value = "rangeStart", required = false)
+                                                   String rangeStart,
+                                                   @RequestParam(value = "rangeEnd", required = false)
+                                                   String rangeEnd,
+                                                   @RequestParam(value = "onlyAvailable", required = false,
+                                                           defaultValue = "false") boolean onlyAvailable,
+                                                   @RequestParam(value = "sort", required = false) String sort,
+                                                   @Min(0) @RequestParam(value = "from", defaultValue = "0") int from,
+                                                   @Min(0) @RequestParam(value = "size", defaultValue = "10") int size,
+                                                   HttpServletRequest httpServletRequest) {
 
         String ip = httpServletRequest.getRemoteAddr();
         String path = httpServletRequest.getRequestURI();
 
         log.info("EventPublicController, searchEvents, search parameters: text: {}, categories: {}, paid: {}," +
-                        "rangeStart: {}, rangeEnd: {}, onlyAvailable: {}, sort: {}, from: {}, size: {}", text,
-                categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+                        "rangeStart: {}, rangeEnd: {}, onlyAvailable: {}, sort: {}, from: {}, size: {}", text, categories,
+                paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
         log.info("EventPublicController, searchEvents. Requester IP: {}, path: {}", ip, path);
 
-        StatisticsDto statisticDto = prepareStatisticDto("ewm-main-service", path, ip);
-        ResponseEntity<Object> response = statisticClient.addStatistics(statisticDto);
+        StatisticDto statisticDto = prepareStatisticDto("ewm-main-service", path, ip);
+        ResponseEntity<Object> response = statisticClient.addStat(statisticDto);
 
         validateResponses(response);
 
@@ -79,25 +77,25 @@ public class EventPublicController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public EventResponse getEvent(@PathVariable("id") long eventId,
+    public EventRespFull getEvent(@PathVariable("id") long eventId,
                                   HttpServletRequest httpServletRequest) {
         String ip = httpServletRequest.getRemoteAddr();
         String path = httpServletRequest.getRequestURI();
 
         log.info("EventPublicController, getEvent, eventId: {}, requesterIp: {}, path: {}", eventId, ip, path);
 
-        StatisticsDto statisticDto = prepareStatisticDto("ewm-main-service", path, ip);
-        ResponseEntity<Object> response = statisticClient.addStatistics(statisticDto);
+        StatisticDto statisticDto = prepareStatisticDto("ewm-main-service", path, ip);
+        ResponseEntity<Object> response = statisticClient.addStat(statisticDto);
 
         validateResponses(response);
 
-        log.info("EventPublicController, getEvent. Statistics was sent to stats-server, statisticDto: {}",
+        log.info("EventPublicController, getEvent. Statistic was sent to stats-server, statisticDto: {}",
                 statisticDto);
         return eventService.getEvent(eventId, path);
     }
 
-    private StatisticsDto prepareStatisticDto(String app, String uri, String ip) {
-        return StatisticsDto
+    private StatisticDto prepareStatisticDto(String app, String uri, String ip) {
+        return StatisticDto
                 .builder()
                 .app(app)
                 .uri(uri)
@@ -129,6 +127,6 @@ public class EventPublicController {
         if (date == null) {
             return null;
         }
-        return LocalDateTime.parse(date, Constants.DATE_FORMATTER);
+        return LocalDateTime.parse(date, GeneralConstants.DATE_FORMATTER);
     }
 }

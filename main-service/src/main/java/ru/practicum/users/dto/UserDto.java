@@ -12,12 +12,12 @@ public class UserDto {
 
     private Long id;
 
-    @NotBlank
-    @Email
+    @NotBlank(message = "Empty email")
+    @Email(message = "email is not correct")
     @Length(min = 6, max = 254)
     private String email;
 
     @Length(min = 2, max = 250)
-    @NotBlank
+    @NotBlank(message = "empty name")
     private String name;
 }

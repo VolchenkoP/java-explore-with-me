@@ -1,19 +1,9 @@
 package ru.practicum.requests.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import ru.practicum.events.model.Event;
 import ru.practicum.users.model.User;
 
@@ -32,7 +22,7 @@ public class Requests {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    @NotNull(message = "created must not be empty")
     private LocalDateTime created;
 
     @ManyToOne
@@ -43,6 +33,6 @@ public class Requests {
     @JoinColumn(name = "requester")
     private User requester;
 
-    @NotBlank
+    @NotBlank(message = "status must be existed")
     private String status;
 }

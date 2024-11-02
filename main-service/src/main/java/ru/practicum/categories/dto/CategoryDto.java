@@ -11,7 +11,7 @@ public class CategoryDto {
 
     private Integer id;
 
-    @NotBlank
+    @NotBlank(message = "empty category name")
     @Length(max = 50, min = 2)
     private String name;
 }

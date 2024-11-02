@@ -3,8 +3,8 @@ package ru.practicum.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.StatisticsDto;
-import ru.practicum.StatisticsResponse;
+import ru.practicum.StatisticDto;
+import ru.practicum.StatisticResponse;
 import ru.practicum.constants.Constants;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.mapper.StatisticsMapper;
@@ -27,7 +27,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     private final StatisticsMapper mapper;
 
     @Override
-    public StatisticsDto createStatistics(StatisticsDto dto) {
+    public StatisticDto createStatistics(StatisticDto dto) {
         App app = validationApp(dto.getApp());
         Statistics statistics = mapper.toEntity(dto);
         statistics.setApp(app);
@@ -36,7 +36,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public List<StatisticsResponse> getStatistics(String start, String end, List<String> uris, boolean unique) {
+    public List<StatisticResponse> getStatistics(String start, String end, List<String> uris, boolean unique) {
         LocalDateTime startTime = convertStringToLocalDateTime(decoderParameters(start));
         log.info("Параметр даты начала успешно сконвертирован");
         LocalDateTime endTime = convertStringToLocalDateTime(decoderParameters(end));
@@ -58,19 +58,19 @@ public class StatisticsServiceImpl implements StatisticsService {
         return getStatsByAllIp(startTime, endTime, uris);
     }
 
-    private List<StatisticsResponse> getStatsByUniqueIp(LocalDateTime start, LocalDateTime end, List<String> uris) {
+    private List<StatisticResponse> getStatsByUniqueIp(LocalDateTime start, LocalDateTime end, List<String> uris) {
         return statisticsRepository.findByUriInAndStartBetweenUniqueIp(uris, start, end);
     }
 
-    private List<StatisticsResponse> getStatsByAllIp(LocalDateTime start, LocalDateTime end, List<String> uris) {
+    private List<StatisticResponse> getStatsByAllIp(LocalDateTime start, LocalDateTime end, List<String> uris) {
         return statisticsRepository.findByUriInAndStartBetween(uris, start, end);
     }
 
-    private List<StatisticsResponse> getStatsForAllEndpointsByUniqueIp(LocalDateTime start, LocalDateTime end) {
+    private List<StatisticResponse> getStatsForAllEndpointsByUniqueIp(LocalDateTime start, LocalDateTime end) {
         return statisticsRepository.findStartBetweenUniqueIp(start, end);
     }
 
-    private List<StatisticsResponse> getStatsForAllEndpointsByAllIp(LocalDateTime start, LocalDateTime end) {
+    private List<StatisticResponse> getStatsForAllEndpointsByAllIp(LocalDateTime start, LocalDateTime end) {
         return statisticsRepository.findStartBetween(start, end);
     }
 

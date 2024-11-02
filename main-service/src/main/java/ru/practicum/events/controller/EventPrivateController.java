@@ -7,23 +7,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ru.practicum.events.dto.EventUpdate;
+import ru.practicum.events.services.EventServicePrivate;
+import ru.practicum.events.dto.EventRespFull;
 import ru.practicum.events.dto.EventRequest;
-import ru.practicum.events.dto.EventResponse;
-import ru.practicum.events.dto.EventResponseShort;
-import ru.practicum.events.dto.EventUpdated;
-import ru.practicum.events.service.privateService.EventPrivateService;
-import ru.practicum.requests.dto.RequestConfirm;
+import ru.practicum.events.dto.EventRespShort;
 import ru.practicum.requests.dto.RequestDto;
 import ru.practicum.requests.dto.RequestResponse;
+import ru.practicum.requests.dto.RequestsForConfirmation;
 
 import java.util.Collection;
 
@@ -34,7 +26,7 @@ import java.util.Collection;
 @Slf4j
 public class EventPrivateController {
 
-    private final EventPrivateService eventService;
+    private final EventServicePrivate eventService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -47,18 +39,16 @@ public class EventPrivateController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Collection<EventResponseShort> getUsersEvents(@PathVariable(value = "userId") long userId,
-                                                         @Min(0)
-                                                         @RequestParam(value = "from", defaultValue = "0") int from,
-                                                         @Min(0)
-                                                         @RequestParam(value = "size", defaultValue = "10") int size) {
+    public Collection<EventRespShort> getUsersEvents(@PathVariable(value = "userId") long userId,
+                                                     @Min(0) @RequestParam(value = "from", defaultValue = "0") int from,
+                                                     @Min(0) @RequestParam(value = "size", defaultValue = "10") int size) {
         log.info("EventPrivateController, getUsersEvents. UserId: {}, from: {}, size: {}", userId, from, size);
         return eventService.getUsersEvents(userId, from, size);
     }
 
     @GetMapping("/{eventId}")
     @ResponseStatus(HttpStatus.OK)
-    public EventResponse getUsersFullEventById(@PathVariable(value = "userId") long userId,
+    public EventRespFull getUsersFullEventById(@PathVariable(value = "userId") long userId,
                                                @PathVariable(value = "eventId") long eventId,
                                                HttpServletRequest request) {
         log.info("EventPrivateController, getUsersFullEvent. UserId: {}, eventId: {}", userId, eventId);
@@ -69,7 +59,7 @@ public class EventPrivateController {
     @ResponseStatus(HttpStatus.OK)
     public EventRequest updateUsersEvent(@PathVariable(value = "userId") long userId,
                                          @PathVariable(value = "eventId") long eventId,
-                                         @Valid @RequestBody EventUpdated eventUpdate) {
+                                         @Valid @RequestBody EventUpdate eventUpdate) {
         log.info("EventPrivateController, updateUsersEvent. UserId: {}, eventId: {}, eventUpdate: {}",
                 userId, eventId, eventUpdate);
         return eventService.updateUsersEvent(userId, eventId, eventUpdate);
@@ -85,7 +75,7 @@ public class EventPrivateController {
 
     @PatchMapping("/{eventId}/requests")
     @ResponseStatus(HttpStatus.OK)
-    public RequestResponse approveRequest(@RequestBody RequestConfirm requestsForConfirmation,
+    public RequestResponse approveRequest(@RequestBody RequestsForConfirmation requestsForConfirmation,
                                           @PathVariable(value = "userId") long userId,
                                           @PathVariable(value = "eventId") long eventId) {
         log.info("EventPrivateController, approveRequest. UserId: {}, eventId: {}", userId, eventId);
