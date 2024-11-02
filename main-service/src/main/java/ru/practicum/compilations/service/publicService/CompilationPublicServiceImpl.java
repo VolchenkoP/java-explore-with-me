@@ -12,7 +12,7 @@ import ru.practicum.compilations.model.Compilation;
 import ru.practicum.compilations.repository.CompilationRepository;
 import ru.practicum.compilations.repository.EventByCompilationRepository;
 import ru.practicum.events.dto.EventResponseShort;
-import ru.practicum.events.mapper.EventMapper;
+import ru.practicum.events.mapper.EventsMapper;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.repository.EventsRepository;
 import ru.practicum.exception.NotFoundException;
@@ -34,6 +34,7 @@ public class CompilationPublicServiceImpl implements CompilationPublicService {
     private final EventsRepository eventRepository;
     private final EventByCompilationRepository eventByCompilationRepository;
     private final CompilationMapper compilationMapper;
+    private final EventsMapper eventsMapper;
 
     @Override
     public CompilationResponse getCompilationById(int compId) {
@@ -43,7 +44,7 @@ public class CompilationPublicServiceImpl implements CompilationPublicService {
 
         List<EventResponseShort> events = eventRepository.findByIdIn(eventIds)
                 .stream()
-                .map(EventMapper::toResponseShort)
+                .map(eventsMapper::toResponseShort)
                 .toList();
 
         CompilationResponse response = compilationMapper.toResponse(compilation);
@@ -72,7 +73,7 @@ public class CompilationPublicServiceImpl implements CompilationPublicService {
                 List<EventResponseShort> events;
                 if (event != null) {
                     events = new ArrayList<>();
-                    events.add(EventMapper.toResponseShort(eventByCompId.getEvent()));
+                    events.add(eventsMapper.toResponseShort(eventByCompId.getEvent()));
                 } else {
                     events = List.of();
                 }
@@ -83,7 +84,7 @@ public class CompilationPublicServiceImpl implements CompilationPublicService {
                 continue;
             }
             eventShortListByCompId.get(eventByCompId.getCompilationId())
-                    .add(EventMapper.toResponseShort(eventByCompId.getEvent()));
+                    .add(eventsMapper.toResponseShort(eventByCompId.getEvent()));
         }
 
         List<CompilationResponse> compilationResponses = new ArrayList<>();

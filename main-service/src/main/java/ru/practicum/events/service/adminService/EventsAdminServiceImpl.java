@@ -13,7 +13,7 @@ import ru.practicum.common.utilities.Utilities;
 import ru.practicum.events.dto.EventResponse;
 import ru.practicum.events.dto.EventResponseShort;
 import ru.practicum.events.dto.EventUpdate;
-import ru.practicum.events.mapper.EventMapper;
+import ru.practicum.events.mapper.EventsMapper;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.EventStates;
 import ru.practicum.events.model.Location;
@@ -44,6 +44,7 @@ public class EventsAdminServiceImpl implements EventsAdminService {
     private final CategoriesRepository categoriesRepository;
     private final RequestsRepository requestRepository;
     private final StatisticsClient statisticClient;
+    private final EventsMapper mapper;
 
     @Override
     public EventResponse adminsUpdate(EventUpdate eventUpdate, long eventId) {
@@ -61,10 +62,10 @@ public class EventsAdminServiceImpl implements EventsAdminService {
             addLocation(eventUpdate.getLocation());
         }
 
-        Event updatedEvent = eventRepository.save(EventMapper.updatingEvent(event, eventUpdate, category));
+        Event updatedEvent = eventRepository.save(mapper.updatingEvent(event, eventUpdate, category));
         long confirmedRequests = requestRepository
                 .countByEventIdAndStatus(eventId, String.valueOf(RequestStatus.CONFIRMED));
-        EventResponse eventFull = EventMapper.toResponse(updatedEvent);
+        EventResponse eventFull = mapper.toResponse(updatedEvent);
         eventFull.setConfirmedRequests(confirmedRequests);
         return eventFull;
     }
@@ -100,7 +101,7 @@ public class EventsAdminServiceImpl implements EventsAdminService {
         List<EventResponse> eventRespFulls = eventRepository
                 .findByConditionals(states, categories, users, rangeStart, rangeEnd, pageable)
                 .stream()
-                .map(EventMapper::toResponse)
+                .map(mapper::toResponse)
                 .toList();
 
         List<Long> eventsIds = eventRespFulls

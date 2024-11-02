@@ -13,7 +13,7 @@ import ru.practicum.compilations.model.EventsByCompilation;
 import ru.practicum.compilations.repository.CompilationRepository;
 import ru.practicum.compilations.repository.EventByCompilationRepository;
 import ru.practicum.events.dto.EventResponseShort;
-import ru.practicum.events.mapper.EventMapper;
+import ru.practicum.events.mapper.EventsMapper;
 import ru.practicum.events.repository.EventsRepository;
 import ru.practicum.exception.NotFoundException;
 
@@ -28,6 +28,7 @@ public class CompilationAdminServiceImpl implements CompilationAdminService {
     private final EventByCompilationRepository eventByCompilationRepository;
     private final EventsRepository eventRepository;
     private final CompilationMapper compilationMapper;
+    private final EventsMapper eventMapper;
 
     @Override
     public CompilationResponse addCompilation(CompilationRequest compilationRequest) {
@@ -92,7 +93,7 @@ public class CompilationAdminServiceImpl implements CompilationAdminService {
 
         return eventRepository.findByIdIn(compilation.getEvents())
                 .stream()
-                .map(EventMapper::toResponseShort)
+                .map(eventMapper::toResponseShort)
                 .toList();
     }
 
