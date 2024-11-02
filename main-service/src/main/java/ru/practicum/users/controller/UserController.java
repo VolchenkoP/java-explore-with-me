@@ -15,9 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.users.service.UserService;
 import ru.practicum.users.dto.UserDto;
-
+import ru.practicum.users.service.UserService;
 
 import java.util.Collection;
 import java.util.Set;

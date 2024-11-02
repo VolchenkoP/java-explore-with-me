@@ -7,11 +7,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.practicum.categories.dto.CategoryDto;
+import ru.practicum.categories.mapper.CategoriesMapper;
+import ru.practicum.categories.model.Category;
 import ru.practicum.categories.repository.CategoriesRepository;
 import ru.practicum.exception.NotFoundException;
-import ru.practicum.categories.dto.CategoryDto;
-import ru.practicum.categories.model.Category;
-import ru.practicum.categories.mapper.CategoriesMapper;
 
 import java.util.Collection;
 import java.util.Optional;

@@ -3,19 +3,19 @@ package ru.practicum.compilations.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.exception.NotFoundException;
-import ru.practicum.compilations.mapper.CompilationMapper;
 import ru.practicum.compilations.dto.CompilationRequest;
 import ru.practicum.compilations.dto.CompilationResponse;
 import ru.practicum.compilations.dto.CompilationUpdate;
+import ru.practicum.compilations.mapper.CompilationMapper;
 import ru.practicum.compilations.model.Compilation;
 import ru.practicum.compilations.model.CompositeKeyForEventByComp;
 import ru.practicum.compilations.model.EventsByCompilation;
 import ru.practicum.compilations.repository.CompilationRepository;
 import ru.practicum.compilations.repository.EventByCompilationRepository;
+import ru.practicum.events.dto.EventRespShort;
 import ru.practicum.events.mapper.EventMapper;
 import ru.practicum.events.repository.EventRepository;
-import ru.practicum.events.dto.EventRespShort;
+import ru.practicum.exception.NotFoundException;
 
 import java.util.List;
 

@@ -3,18 +3,18 @@ package ru.practicum.requests.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.events.model.Event;
+import ru.practicum.events.model.EventStates;
+import ru.practicum.events.repository.EventRepository;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
-import ru.practicum.events.repository.EventRepository;
-import ru.practicum.events.model.EventStates;
-import ru.practicum.events.model.Event;
-import ru.practicum.requests.model.RequestStatus;
 import ru.practicum.requests.dto.RequestDto;
 import ru.practicum.requests.mapper.RequestMapper;
+import ru.practicum.requests.model.RequestStatus;
 import ru.practicum.requests.model.Requests;
 import ru.practicum.requests.repository.RequestRepository;
-import ru.practicum.users.repository.UserRepository;
 import ru.practicum.users.model.User;
+import ru.practicum.users.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -31,6 +31,48 @@ public class RequestServiceImp implements RequestService {
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final RequestMapper requestMapper;
+
+    private static void sortByRequesterIdAndEventId(List<Requests> list) {
+        list.sort((Requests req1, Requests req2) -> {
+            if (req1.getRequester().getId() > req2.getRequester().getId()) {
+                return 1;
+            } else if (req1.getRequester().getId().equals(req2.getRequester().getId())) {
+                return req1.getEvent().getId().compareTo(req2.getEvent().getId());
+            } else {
+                return -1;
+            }
+        });
+    }
+
+    private static void isThereDuplicate(List<Requests> list, long requesterTargetId, long eventTargetId) {
+        sortByRequesterIdAndEventId(list);
+
+        int low = 0;
+        int high = list.size() - 1;
+        int mid;
+
+        while (low <= high) {
+            mid = (low + high) / 2;
+
+            if (list.get(mid).getRequester().getId().equals(requesterTargetId)) {
+                if (list.get(mid).getEvent().getId().equals(eventTargetId)) {
+                    log.warn("Запрос с id: {} направлен повторно", requesterTargetId);
+                    throw new ConflictException("Запрос с id: " + requesterTargetId + " дубликат");
+                } else {
+                    if (list.get(mid).getEvent().getId() < eventTargetId) {
+                        low = mid + 1;
+                    } else {
+                        high = mid - 1;
+                    }
+                }
+
+            } else if (list.get(mid).getRequester().getId() < requesterTargetId) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+    }
 
     @Override
     public RequestDto addRequest(long eventId, long userId) {
@@ -134,48 +176,6 @@ public class RequestServiceImp implements RequestService {
             throw new NotFoundException("Пользователь с id = " + userId + " не найден");
         }
         return user.get();
-    }
-
-    private static void sortByRequesterIdAndEventId(List<Requests> list) {
-        list.sort((Requests req1, Requests req2) -> {
-            if (req1.getRequester().getId() > req2.getRequester().getId()) {
-                return 1;
-            } else if (req1.getRequester().getId().equals(req2.getRequester().getId())) {
-                return req1.getEvent().getId().compareTo(req2.getEvent().getId());
-            } else {
-                return -1;
-            }
-        });
-    }
-
-    private static void isThereDuplicate(List<Requests> list, long requesterTargetId, long eventTargetId) {
-        sortByRequesterIdAndEventId(list);
-
-        int low = 0;
-        int high = list.size() - 1;
-        int mid;
-
-        while (low <= high) {
-            mid = (low + high) / 2;
-
-            if (list.get(mid).getRequester().getId().equals(requesterTargetId)) {
-                if (list.get(mid).getEvent().getId().equals(eventTargetId)) {
-                    log.warn("Запрос с id: {} направлен повторно", requesterTargetId);
-                    throw new ConflictException("Запрос с id: " + requesterTargetId + " дубликат");
-                } else {
-                    if (list.get(mid).getEvent().getId() < eventTargetId) {
-                        low = mid + 1;
-                    } else {
-                        high = mid - 1;
-                    }
-                }
-
-            } else if (list.get(mid).getRequester().getId() < requesterTargetId) {
-                low = mid + 1;
-            } else {
-                high = mid - 1;
-            }
-        }
     }
 }
 

@@ -27,7 +27,7 @@ public class StatisticClient extends BaseClient {
     }
 
     public ResponseEntity<List<StatisticResponse>> getStat(LocalDateTime start, LocalDateTime end,
-                                                                 @Nullable String uris, boolean unique) {
+                                                           @Nullable String uris, boolean unique) {
         String encodedStartDate = encodeParameter(convertLocalDateTimeToString(start));
         String encodedEndDate = encodeParameter(convertLocalDateTimeToString(end));
 

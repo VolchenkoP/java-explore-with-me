@@ -3,13 +3,13 @@ package ru.practicum.events.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ru.practicum.categories.model.Category;
-import ru.practicum.events.model.EventStates;
 import ru.practicum.events.dto.EventRequest;
 import ru.practicum.events.dto.EventRespFull;
 import ru.practicum.events.dto.EventRespShort;
 import ru.practicum.events.dto.EventUpdate;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.EventStateAction;
+import ru.practicum.events.model.EventStates;
 
 import java.time.LocalDateTime;
 
