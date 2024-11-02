@@ -1,5 +1,6 @@
 package ru.practicum.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -10,22 +11,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.common.constants.Constants;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
+@Slf4j
 @RestControllerAdvice
-public class ExceptionController {
+public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
         String reason = e.getBody().getDetail();
-        String field;
-        if (!Objects.requireNonNull(e.getBindingResult().getFieldError()).getField().isEmpty()) {
-            field = Objects.requireNonNull(e.getBindingResult().getFieldError()).getField();
-        } else {
-            field = e.getMessage();
-        }
-        String message = "Field: " + field +
+        String message = "Field: " + e.getBindingResult().getFieldError().getField() +
                 " error: " + e.getBindingResult().getFieldError().getDefaultMessage();
         return new ErrorResponse(HttpStatus.BAD_REQUEST.getReasonPhrase(), reason, message, prepareResponseDate());
     }

@@ -19,11 +19,11 @@ public class RequestDto {
     private LocalDateTime created;
 
     @NotNull
-    @Min(0)
+    @Min(value = 0)
     private Long event;
 
     @NotNull
-    @Min(0)
+    @Min(value = 0)
     private Long requester;
 
     private String status;

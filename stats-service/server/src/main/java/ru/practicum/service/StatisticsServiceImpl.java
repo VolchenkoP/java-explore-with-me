@@ -43,14 +43,14 @@ public class StatisticsServiceImpl implements StatisticsService {
         log.info("Параметр даты окончания успешно сконвертирован");
 
         if (unique) {
-            if (uris == null) {
+            if (uris == null || uris.isEmpty()) {
                 log.info("Поиск всей статистики для уникального IP");
                 return getStatsForAllEndpointsByUniqueIp(startTime, endTime);
             }
             log.info("Поиск статистики для уникального IP и списка ссылок");
             return getStatsByUniqueIp(startTime, endTime, uris);
         }
-        if (uris == null) {
+        if (uris == null || uris.isEmpty()) {
             log.info("Поиск всей статистики");
             return getStatsForAllEndpointsByAllIp(startTime, endTime);
         }
