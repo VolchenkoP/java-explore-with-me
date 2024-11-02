@@ -11,14 +11,16 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import ru.practicum.constants.Constants;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "statistics")
-@Data
+@Getter
+@Setter
 @Builder
 public class Statistics {
     @Id
