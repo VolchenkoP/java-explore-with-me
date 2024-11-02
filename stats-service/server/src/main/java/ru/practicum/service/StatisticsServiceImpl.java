@@ -7,6 +7,7 @@ import ru.practicum.StatisticDto;
 import ru.practicum.StatisticResponse;
 import ru.practicum.constants.Constants;
 import ru.practicum.exception.NotFoundException;
+import ru.practicum.exception.ValidationException;
 import ru.practicum.mapper.StatisticsMapper;
 import ru.practicum.model.App;
 import ru.practicum.model.Statistics;
@@ -41,6 +42,8 @@ public class StatisticsServiceImpl implements StatisticsService {
         log.info("Параметр даты начала успешно сконвертирован");
         LocalDateTime endTime = convertStringToLocalDateTime(decoderParameters(end));
         log.info("Параметр даты окончания успешно сконвертирован");
+
+        validateDates(startTime, endTime);
 
         if (unique) {
             if (uris == null || uris.isEmpty()) {
@@ -78,6 +81,16 @@ public class StatisticsServiceImpl implements StatisticsService {
         log.info("Поиск сервиса с именем: {}", appName);
         return appRepository.findByName(appName)
                 .orElseThrow(() -> new NotFoundException("Сервис с именем " + appName + " не найден"));
+    }
+
+    private void validateDates(LocalDateTime start, LocalDateTime end) {
+        if (start == null || end == null) {
+            return;
+        }
+        if (start.isAfter(end)) {
+            log.warn("Start is after end");
+            throw new ValidationException("Start is after end");
+        }
     }
 
     private String decoderParameters(String parameter) {
