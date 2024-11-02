@@ -1,80 +1,40 @@
 package ru.practicum.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.common.constants.Constants;
-
-import java.time.LocalDateTime;
 
 @Slf4j
 @RestControllerAdvice
 public class ErrorHandler {
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
-        String reason = e.getBody().getDetail();
-        String message = "Field: " + e.getBindingResult().getFieldError().getField() +
-                " error: " + e.getBindingResult().getFieldError().getDefaultMessage();
-        return new ErrorResponse(HttpStatus.BAD_REQUEST.getReasonPhrase(), reason, message, prepareResponseDate());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleConflict(final ConflictException e) {
-        String reason = "Integrity constraint has been violated";
-        String message = e.getMessage();
-        return new ErrorResponse(HttpStatus.CONFLICT.getReasonPhrase(), reason, message, prepareResponseDate());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleConflict(final DataIntegrityViolationException e) {
-        String reason = "Integrity constraint has been violated";
-        String message = "could not execute statement; constraint " + e.getMostSpecificCause();
-        return new ErrorResponse(HttpStatus.CONFLICT.getReasonPhrase(), reason, message, prepareResponseDate());
-    }
-
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNotFoundException(final NotFoundException e) {
-        String reason = "The required object was not found.";
-        String message = e.getMessage();
-        return new ErrorResponse(HttpStatus.NOT_FOUND.getReasonPhrase(), reason, message, prepareResponseDate());
+    public ErrorResponse handleNotFoundException(NotFoundException e) {
+        log.error("Ошибка при поиске данных");
+        return new ErrorResponse("Данные не найдены", e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationException(final ValidationException e) {
-        String reason = "Incorrectly made request.";
-        String message = e.getMessage();
-        return new ErrorResponse(HttpStatus.BAD_REQUEST.getReasonPhrase(), reason, message, prepareResponseDate());
+    public ErrorResponse handleValidationException(ValidationException e) {
+        log.error("Ошибка при валидации данных");
+        return new ErrorResponse("Данные не прошли валидацию", e.getMessage());
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleMissingServletRequestParameterException(final MissingServletRequestParameterException e) {
-        String reason = "Incorrectly made request.";
-        String message = e.getMessage();
-        return new ErrorResponse(HttpStatus.BAD_REQUEST.getReasonPhrase(), reason, message, prepareResponseDate());
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleConflictException(ConflictException e) {
+        log.error("Нарушено ограничение целостности");
+        return new ErrorResponse("Ошибка запроса данных", e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleThrowable(final Throwable e) {
-        String reason = "Something went wrong";
-        String message = e.getMessage();
-        return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                reason, message, prepareResponseDate());
-    }
-
-    private String prepareResponseDate() {
-        return LocalDateTime.now().format(Constants.DATE_FORMATTER);
+    public ErrorResponse handleThrowable(Throwable e) {
+        log.error("Внутренняя ошибка сервера");
+        return new ErrorResponse("Ошибка сервера", e.getMessage());
     }
 }
