@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @SuperBuilder
 public class EventResponse extends EventResponseShort {
 
-    @NotNull(message = "empty createdOn")
+    @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Constants.DATA_PATTERN)
     private LocalDateTime createdOn;
 
@@ -26,13 +26,13 @@ public class EventResponse extends EventResponseShort {
     @Length(min = 20, max = 7000)
     private String description;
 
-    @NotNull(message = "location is null")
+    @NotNull
     private Location location;
 
-    @Min(value = 0, message = "participantLimit is negative")
+    @Min(value = 0)
     private Integer participantLimit;
 
-    @NotNull(message = "publishedOn is null")
+    @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Constants.DATA_PATTERN)
     private LocalDateTime publishedOn;
 

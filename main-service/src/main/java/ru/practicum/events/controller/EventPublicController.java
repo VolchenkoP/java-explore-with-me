@@ -39,14 +39,20 @@ public class EventPublicController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Collection<EventResponseShort> searchEvents(@RequestParam(value = "text", required = false) String text,
-                                                       @RequestParam(value = "categories", required = false) List<Integer> categories,
+                                                       @RequestParam(value = "categories", required = false)
+                                                       List<Integer> categories,
                                                        @RequestParam(value = "paid", required = false) Boolean paid,
-                                                       @RequestParam(value = "rangeStart", required = false) String rangeStart,
-                                                       @RequestParam(value = "rangeEnd", required = false) String rangeEnd,
-                                                       @RequestParam(value = "onlyAvailable", required = false, defaultValue = "false") boolean onlyAvailable,
+                                                       @RequestParam(value = "rangeStart", required = false)
+                                                       String rangeStart,
+                                                       @RequestParam(value = "rangeEnd", required = false)
+                                                       String rangeEnd,
+                                                       @RequestParam(value = "onlyAvailable", required = false,
+                                                               defaultValue = "false") boolean onlyAvailable,
                                                        @RequestParam(value = "sort", required = false) String sort,
-                                                       @Min(0) @RequestParam(value = "from", defaultValue = "0") int from,
-                                                       @Min(0) @RequestParam(value = "size", defaultValue = "10") int size,
+                                                       @Min(0)
+                                                       @RequestParam(value = "from", defaultValue = "0") int from,
+                                                       @Min(0)
+                                                       @RequestParam(value = "size", defaultValue = "10") int size,
                                                        HttpServletRequest httpServletRequest) {
 
         String ip = httpServletRequest.getRemoteAddr();
@@ -73,12 +79,12 @@ public class EventPublicController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public EventResponse getEvent(@PathVariable("id") long id,
+    public EventResponse getEvent(@PathVariable("id") long eventId,
                                   HttpServletRequest httpServletRequest) {
         String ip = httpServletRequest.getRemoteAddr();
         String path = httpServletRequest.getRequestURI();
 
-        log.info("EventPublicController, getEvent, eventId: {}, requesterIp: {}, path: {}", id, ip, path);
+        log.info("EventPublicController, getEvent, eventId: {}, requesterIp: {}, path: {}", eventId, ip, path);
 
         StatisticsDto statisticDto = prepareStatisticDto("ewm-main-service", path, ip);
         ResponseEntity<Object> response = statisticClient.addStatistics(statisticDto);
@@ -87,7 +93,7 @@ public class EventPublicController {
 
         log.info("EventPublicController, getEvent. Statistics was sent to stats-server, statisticDto: {}",
                 statisticDto);
-        return eventService.getEvent(id, path);
+        return eventService.getEvent(eventId, path);
     }
 
     private StatisticsDto prepareStatisticDto(String app, String uri, String ip) {

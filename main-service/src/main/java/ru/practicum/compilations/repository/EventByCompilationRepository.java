@@ -2,7 +2,6 @@ package ru.practicum.compilations.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 import ru.practicum.compilations.dto.EventByCompilationId;
 import ru.practicum.compilations.model.CompositeKeyForEventByCompilation;
 import ru.practicum.compilations.model.EventsByCompilation;
@@ -10,7 +9,6 @@ import ru.practicum.compilations.model.EventsByCompilation;
 import java.util.Collection;
 import java.util.List;
 
-@Repository
 public interface EventByCompilationRepository extends JpaRepository<EventsByCompilation,
         CompositeKeyForEventByCompilation> {
 

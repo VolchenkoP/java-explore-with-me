@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class EventUpdate {
+public class EventUpdated {
 
     private Long id;
 

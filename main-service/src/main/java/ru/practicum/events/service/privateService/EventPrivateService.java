@@ -3,10 +3,10 @@ package ru.practicum.events.service.privateService;
 import ru.practicum.events.dto.EventRequest;
 import ru.practicum.events.dto.EventResponse;
 import ru.practicum.events.dto.EventResponseShort;
-import ru.practicum.events.dto.EventUpdate;
+import ru.practicum.events.dto.EventUpdated;
+import ru.practicum.requests.dto.RequestConfirm;
 import ru.practicum.requests.dto.RequestDto;
 import ru.practicum.requests.dto.RequestResponse;
-import ru.practicum.requests.dto.RequestsForConfirmation;
 
 import java.util.Collection;
 
@@ -18,11 +18,11 @@ public interface EventPrivateService {
 
     EventResponse getUsersFullEventById(long userId, long eventId, String path);
 
-    EventRequest updateUsersEvent(long userId, long eventId, EventUpdate eventUpdate);
+    EventRequest updateUsersEvent(long userId, long eventId, EventUpdated eventUpdate);
 
     Collection<RequestDto> getRequestsByEventId(long eventId, long userId);
 
-    RequestResponse approveRequests(RequestsForConfirmation requestsForConfirmation,
+    RequestResponse approveRequests(RequestConfirm requestsForConfirmation,
                                     long userId,
                                     long eventId);
 }

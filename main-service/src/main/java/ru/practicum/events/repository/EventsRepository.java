@@ -3,21 +3,17 @@ package ru.practicum.events.repository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 import ru.practicum.events.model.Event;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
 public interface EventsRepository extends JpaRepository<Event, Long> {
 
     List<Event> findByIdIn(List<Long> id);
 
     List<Event> findByInitiatorId(long userId, Pageable pageable);
-
-    List<Event> findByInitiatorIdAndState(long userId, String state, Pageable pageable);
 
     Optional<Event> findByIdAndState(long id, String state);
 

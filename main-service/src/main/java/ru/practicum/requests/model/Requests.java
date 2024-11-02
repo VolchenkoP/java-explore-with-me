@@ -32,7 +32,7 @@ public class Requests {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "created empty")
+    @NotNull
     private LocalDateTime created;
 
     @ManyToOne
@@ -43,6 +43,6 @@ public class Requests {
     @JoinColumn(name = "requester")
     private User requester;
 
-    @NotBlank(message = "status empty")
+    @NotBlank
     private String status;
 }

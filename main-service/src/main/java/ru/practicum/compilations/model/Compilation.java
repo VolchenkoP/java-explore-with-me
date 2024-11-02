@@ -25,11 +25,11 @@ public class Compilation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotBlank(message = "empty title")
+    @NotBlank
     @Length(max = 50)
     private String title;
 
-    @NotNull(message = "pinned must not be null")
+    @NotNull
     private Boolean pinned;
 
 

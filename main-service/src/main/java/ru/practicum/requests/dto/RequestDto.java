@@ -18,12 +18,12 @@ public class RequestDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Constants.DATA_PATTERN)
     private LocalDateTime created;
 
-    @NotNull(message = "event is null")
-    @Min(value = 0, message = "eventId < 0")
+    @NotNull
+    @Min(0)
     private Long event;
 
-    @NotNull(message = "requester is null")
-    @Min(value = 0, message = "requesterId < 0")
+    @NotNull
+    @Min(0)
     private Long requester;
 
     private String status;

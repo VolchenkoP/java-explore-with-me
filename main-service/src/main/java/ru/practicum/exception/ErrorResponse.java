@@ -1,9 +1,9 @@
 package ru.practicum.exception;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Getter
 public class ErrorResponse {
     private final String status;
