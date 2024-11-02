@@ -12,8 +12,8 @@ public class UserDto {
 
     private Long id;
 
-    @NotBlank(message = "empty email")
-    @Email(message = "not correct email")
+    @NotBlank(message = "Empty email")
+    @Email(message = "email is not correct")
     @Length(min = 6, max = 254)
     private String email;
 

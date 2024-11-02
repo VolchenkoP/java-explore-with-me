@@ -46,4 +46,5 @@ public class EventUpdate {
     private LocalDateTime createdOn;
 
     private String stateAction;
+
 }

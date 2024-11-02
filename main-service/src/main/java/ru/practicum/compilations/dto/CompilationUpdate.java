@@ -18,4 +18,5 @@ public class CompilationUpdate {
     private Boolean pinned;
 
     private List<Long> events;
+
 }
