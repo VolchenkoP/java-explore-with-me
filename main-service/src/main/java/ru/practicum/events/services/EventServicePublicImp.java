@@ -5,19 +5,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.practicum.common.ConnectToStatServer;
-import ru.practicum.common.GeneralConstants;
-import ru.practicum.common.Utilities;
-import ru.practicum.errors.NotFoundException;
-import ru.practicum.errors.ValidationException;
-import ru.practicum.events.EventMapper;
-import ru.practicum.events.EventRepository;
-import ru.practicum.events.EventStates;
+import ru.practicum.common.config.ConnectToStatServer;
+import ru.practicum.common.constants.Constants;
+import ru.practicum.common.utilites.Utilities;
+import ru.practicum.exception.NotFoundException;
+import ru.practicum.exception.ValidationException;
+import ru.practicum.events.mapper.EventMapper;
+import ru.practicum.events.repository.EventRepository;
+import ru.practicum.events.model.EventStates;
 import ru.practicum.events.dto.EventRespFull;
 import ru.practicum.events.dto.EventRespShort;
 import ru.practicum.events.model.Event;
-import ru.practicum.requests.RequestRepository;
-import ru.practicum.requests.RequestStatus;
+import ru.practicum.requests.repository.RequestRepository;
+import ru.practicum.requests.model.RequestStatus;
 import ru.practicum.requests.dto.EventIdByRequestsCount;
 import ru.practicum.statisticsClient.StatisticClient;
 
@@ -55,7 +55,7 @@ public class EventServicePublicImp implements EventsServicePublic {
             rangeStart = LocalDateTime.now();
         }
         if (rangeEnd == null) {
-            rangeEnd = GeneralConstants.defaultEndTime;
+            rangeEnd = Constants.defaultEndTime;
         }
 
         List<EventRespShort> events = eventRepository
@@ -73,8 +73,8 @@ public class EventServicePublicImp implements EventsServicePublic {
                 .stream()
                 .collect(Collectors.toMap(EventIdByRequestsCount::getEvent, EventIdByRequestsCount::getCount));
 
-        List<Long> views = ConnectToStatServer.getViews(GeneralConstants.defaultStartTime,
-                GeneralConstants.defaultEndTime, ConnectToStatServer.prepareUris(eventsIds),
+        List<Long> views = ConnectToStatServer.getViews(Constants.defaultStartTime,
+                Constants.defaultEndTime, ConnectToStatServer.prepareUris(eventsIds),
                 true, statisticClient);
 
         List<? extends EventRespShort> eventsForResp =
@@ -87,8 +87,8 @@ public class EventServicePublicImp implements EventsServicePublic {
     public EventRespFull getEvent(long eventId, String path) {
         Event event = eventRepository.findByIdAndState(eventId, String.valueOf(EventStates.PUBLISHED))
                 .orElseThrow(() -> {
-                    log.warn("Attempt to get unknown event");
-                    return new NotFoundException("Event with id = " + eventId + "was not found");
+                    log.warn("Поиск неизвестного события");
+                    return new NotFoundException("Событие с id = " + eventId + " не найдено");
                 });
 
         long confirmedRequests = requestRepository.countByEventIdAndStatus(eventId,
@@ -96,8 +96,8 @@ public class EventServicePublicImp implements EventsServicePublic {
 
         EventRespFull eventFull = eventMapper.mapToEventRespFull(event);
         eventFull.setConfirmedRequests(confirmedRequests);
-        List<Long> views = ConnectToStatServer.getViews(GeneralConstants.defaultStartTime,
-                GeneralConstants.defaultEndTime, path,
+        List<Long> views = ConnectToStatServer.getViews(Constants.defaultStartTime,
+                Constants.defaultEndTime, path,
                 true, statisticClient);
         if (views.isEmpty()) {
             eventFull.setViews(0L);
@@ -111,8 +111,8 @@ public class EventServicePublicImp implements EventsServicePublic {
             return;
         }
         if (start.isAfter(end)) {
-            log.warn("Prohibited. Start is after end. Start: {}, end: {}", start, end);
-            throw new ValidationException("Event must be published");
+            log.warn("Отклонено, начало не может быть позже окончания, начало: {}, окончание: {}", start, end);
+            throw new ValidationException("Событие не опубликовано");
         }
     }
 }

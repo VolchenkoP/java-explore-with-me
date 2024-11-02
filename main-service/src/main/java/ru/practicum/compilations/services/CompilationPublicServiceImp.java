@@ -5,19 +5,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.practicum.errors.NotFoundException;
-import ru.practicum.compilations.CompilationMapper;
+import ru.practicum.exception.NotFoundException;
+import ru.practicum.compilations.mapper.CompilationMapper;
 import ru.practicum.compilations.dto.CompilationResponse;
 import ru.practicum.compilations.dto.EventByCompId;
 import ru.practicum.compilations.model.Compilation;
 import ru.practicum.compilations.repository.CompilationRepository;
 import ru.practicum.compilations.repository.EventByCompilationRepository;
-import ru.practicum.events.EventMapper;
-import ru.practicum.events.EventRepository;
+import ru.practicum.events.mapper.EventMapper;
+import ru.practicum.events.repository.EventRepository;
 import ru.practicum.events.dto.EventRespShort;
 import ru.practicum.events.model.Event;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -102,8 +106,8 @@ public class CompilationPublicServiceImp implements CompilationPublicService {
         Optional<Compilation> compilation = compilationRepository.findById(compId);
 
         if (compilation.isEmpty()) {
-            log.warn("Compilation with id {} was not found", compId);
-            throw new NotFoundException("Compilation with id = " + compId + " was not found");
+            log.warn("Компиляция с id: {} не найдена", compId);
+            throw new NotFoundException("Компиляция с id: " + compId + " не найдена");
         }
         return compilation.get();
     }

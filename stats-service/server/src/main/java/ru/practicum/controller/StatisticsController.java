@@ -27,9 +27,9 @@ public class StatisticsController {
     @GetMapping("/stats")
     @ResponseStatus(HttpStatus.OK)
     public List<StatisticResponse> getStatistics(@RequestParam("start")
-                                                  @DateTimeFormat(pattern = Constants.DATE_PATTERN) String start,
+                                                 @DateTimeFormat(pattern = Constants.DATE_PATTERN) String start,
                                                  @RequestParam("end")
-                                                  @DateTimeFormat(pattern = Constants.DATE_PATTERN) String end,
+                                                 @DateTimeFormat(pattern = Constants.DATE_PATTERN) String end,
                                                  @RequestParam(required = false, value = "uris") List<String> uris,
                                                  @RequestParam(required = false, value = "unique") boolean unique) {
         log.info("Получение статистики по следующим параметрам: {}, {}, {}, {}.", start, end, uris, unique);

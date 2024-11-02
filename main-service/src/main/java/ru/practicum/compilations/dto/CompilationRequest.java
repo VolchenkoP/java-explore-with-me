@@ -9,7 +9,7 @@ import org.hibernate.validator.constraints.Length;
 @Data
 public class CompilationRequest extends CompilationUpdate {
 
-    @NotBlank(message = "Empty title")
+    @NotBlank(message = "empty title")
     @Length(max = 50)
     private String title;
 }

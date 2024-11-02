@@ -12,7 +12,7 @@ public class UserDto {
 
     private Long id;
 
-    @NotBlank(message = "Empty email")
+    @NotBlank(message = "empty email")
     @Email(message = "email is not correct")
     @Length(min = 6, max = 254)
     private String email;

@@ -88,8 +88,8 @@ public class StatisticsServiceImpl implements StatisticsService {
             return;
         }
         if (start.isAfter(end)) {
-            log.warn("Start is after end");
-            throw new ValidationException("Start is after end");
+            log.warn("Дата начала позже даты окончания");
+            throw new ValidationException("Дата начала позже даты окончания");
         }
     }
 

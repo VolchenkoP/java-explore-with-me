@@ -5,33 +5,33 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.practicum.categories.CategoriesRepository;
+import ru.practicum.categories.repository.CategoriesRepository;
 import ru.practicum.categories.model.Category;
-import ru.practicum.common.ConnectToStatServer;
-import ru.practicum.common.GeneralConstants;
-import ru.practicum.common.Utilities;
-import ru.practicum.errors.ConflictException;
-import ru.practicum.errors.NotFoundException;
-import ru.practicum.events.EventMapper;
-import ru.practicum.events.EventRepository;
-import ru.practicum.events.EventStates;
-import ru.practicum.events.LocationRepository;
+import ru.practicum.common.config.ConnectToStatServer;
+import ru.practicum.common.constants.Constants;
+import ru.practicum.common.utilites.Utilities;
+import ru.practicum.exception.ConflictException;
+import ru.practicum.exception.NotFoundException;
+import ru.practicum.events.mapper.EventMapper;
+import ru.practicum.events.repository.EventRepository;
+import ru.practicum.events.model.EventStates;
+import ru.practicum.events.repository.LocationRepository;
 import ru.practicum.events.dto.EventRequest;
 import ru.practicum.events.dto.EventRespFull;
 import ru.practicum.events.dto.EventRespShort;
 import ru.practicum.events.dto.EventUpdate;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.Location;
-import ru.practicum.requests.RequestMapper;
-import ru.practicum.requests.RequestRepository;
-import ru.practicum.requests.RequestStatus;
+import ru.practicum.requests.mapper.RequestMapper;
+import ru.practicum.requests.repository.RequestRepository;
+import ru.practicum.requests.model.RequestStatus;
 import ru.practicum.requests.dto.EventIdByRequestsCount;
 import ru.practicum.requests.dto.RequestDto;
 import ru.practicum.requests.dto.RequestResponse;
 import ru.practicum.requests.dto.RequestsForConfirmation;
 import ru.practicum.requests.model.Requests;
 import ru.practicum.statisticsClient.StatisticClient;
-import ru.practicum.users.UserRepository;
+import ru.practicum.users.repository.UserRepository;
 import ru.practicum.users.model.User;
 
 import java.time.LocalDateTime;
@@ -68,7 +68,7 @@ public class EventServicePrivateImp implements EventServicePrivate {
         }
 
         validateEventDate(eventRequest.getEventDate());
-        addLocation(eventRequest.getLocation()); //Adding locations to database because location is separated entity
+        addLocation(eventRequest.getLocation());
         Event addingEvent = eventMapper.mapToEvent(eventRequest);
         addingEvent.setInitiator(validateAndGetUser(userId));
         addingEvent.setCategory(validateAndGetCategory(eventRequest.getCategory()));
@@ -96,7 +96,7 @@ public class EventServicePrivateImp implements EventServicePrivate {
                 .stream()
                 .collect(Collectors.toMap(EventIdByRequestsCount::getEvent, EventIdByRequestsCount::getCount));
 
-        List<Long> views = ConnectToStatServer.getViews(GeneralConstants.defaultStartTime, GeneralConstants.defaultEndTime,
+        List<Long> views = ConnectToStatServer.getViews(Constants.defaultStartTime, Constants.defaultEndTime,
                 ConnectToStatServer.prepareUris(eventIds), true, statisticClient);
 
         List<? extends EventRespShort> eventsForResp =
@@ -113,8 +113,8 @@ public class EventServicePrivateImp implements EventServicePrivate {
                 .countByEventIdAndStatus(eventId, String.valueOf(RequestStatus.CONFIRMED));
         EventRespFull eventRespFull = eventMapper.mapToEventRespFull(event);
         eventRespFull.setConfirmedRequests(confirmedRequests);
-        List<Long> views = ConnectToStatServer.getViews(GeneralConstants.defaultStartTime,
-                GeneralConstants.defaultEndTime, path, true, statisticClient);
+        List<Long> views = ConnectToStatServer.getViews(Constants.defaultStartTime,
+                Constants.defaultEndTime, path, true, statisticClient);
         if (views.isEmpty()) {
             eventRespFull.setViews(0L);
             return eventRespFull;
@@ -157,13 +157,13 @@ public class EventServicePrivateImp implements EventServicePrivate {
         Event event = validateAndGetEvent(eventId); //checking event availability
 
         List<Requests> requests = requestRepository
-                .findByIdInAndEventId(requestsForConfirmation.getRequestIds(), eventId); //Updating requests for event
+                .findByIdInAndEventId(requestsForConfirmation.getRequestIds(), eventId);
 
-        checkRequestStatus(requests); //Checking request`s status cause all requests should be PENDING  either CONFLICT
+        checkRequestStatus(requests);
 
-        int participants = countParticipants(eventId); //Approved participants
-        checkParticipantsLimit(event.getParticipantLimit(), participants); //Check possibility to add
-        int freeSlots = event.getParticipantLimit() - participants; //Amount participants who can be added
+        int participants = countParticipants(eventId);
+        checkParticipantsLimit(event.getParticipantLimit(), participants);
+        int freeSlots = event.getParticipantLimit() - participants;
 
         if (freeSlots >= requests.size()) {
             List<RequestDto> approvedRequest = requestRepository.saveAll(setStatusToRequests(RequestStatus
@@ -219,9 +219,9 @@ public class EventServicePrivateImp implements EventServicePrivate {
 
     private void checkParticipantsLimit(long participantsLimit, long participants) {
         if (participantsLimit < (participants + 1)) {
-            log.warn("Unable to add request. ParticipantLimit {} less then request amount {}",
+            log.warn("Невозможно добавить запрос. Лимит участников {} меньше чем запросов {}",
                     participantsLimit, (participants + 1));
-            throw new ConflictException("Exceeded requesters amount");
+            throw new ConflictException("Превышено количество запросов");
         }
     }
 
@@ -232,14 +232,14 @@ public class EventServicePrivateImp implements EventServicePrivate {
         while (leftIdx <= rightIdx) {
 
             if (!request.get(leftIdx).getStatus().equals(RequestStatus.PENDING.name())) {
-                log.warn("Status must be PENDING");
-                throw new ConflictException("Request with id = " + request.get(leftIdx).getId() + " has status: "
+                log.warn("Статус должен быть PENDING");
+                throw new ConflictException("Запрос с id = " + request.get(leftIdx).getId() + " со статусом: "
                         + request.get(leftIdx).getStatus());
             }
 
             if (!request.get(rightIdx).getStatus().equals(RequestStatus.PENDING.name())) {
-                log.warn("Status must be PENDING");
-                throw new ConflictException("Request with id = " + request.get(rightIdx).getId() + " has status: "
+                log.warn("Статус может быть только PENDING");
+                throw new ConflictException("Запрос с id: " + request.get(rightIdx).getId() + " со статусом: "
                         + request.get(rightIdx).getStatus());
             }
             leftIdx++;
@@ -253,8 +253,8 @@ public class EventServicePrivateImp implements EventServicePrivate {
 
     private void validateEventDate(LocalDateTime eventDate) {
         if (eventDate.isBefore(LocalDateTime.now().plusHours(2))) {
-            log.warn("Event data ({}) is before then now + 2 hours", eventDate);
-            throw new ConflictException("Event data " + eventDate + " is before then now + 2 hours");
+            log.warn("Дата события ({}) меньше чем через 2 часа", eventDate);
+            throw new ConflictException("Дата события " + eventDate + " меньше чем через 2 часа");
         }
     }
 
@@ -262,8 +262,8 @@ public class EventServicePrivateImp implements EventServicePrivate {
         Optional<Event> event = eventRepository.findById(eventId);
 
         if (event.isEmpty()) {
-            log.warn("Attempt to get unknown event");
-            throw new NotFoundException("Event with id = " + eventId + "was not found");
+            log.warn("Обращение к неизвестному событию");
+            throw new NotFoundException("Событие с id = " + eventId + " не найдено");
         }
         return event.get();
     }
@@ -272,8 +272,8 @@ public class EventServicePrivateImp implements EventServicePrivate {
         Optional<User> user = userRepository.findById(userId);
 
         if (user.isEmpty()) {
-            log.warn("Attempt to delete unknown user");
-            throw new NotFoundException("User with id = " + userId + " was not found");
+            log.warn("Попытка поиска неизвестного пользователя");
+            throw new NotFoundException("Пользователь с id = " + userId + " не найден");
         }
         return user.get();
     }
@@ -282,8 +282,8 @@ public class EventServicePrivateImp implements EventServicePrivate {
         Optional<Category> category = categoriesRepository.findById(categoryId);
 
         if (category.isEmpty()) {
-            log.warn("Attempt to delete unknown category with categoryId: {}", categoryId);
-            throw new NotFoundException("Category with id = " + categoryId + " was not found");
+            log.warn("Попытка поиска неизвестной категорию с id: {}", categoryId);
+            throw new NotFoundException("Категория с id = " + categoryId + " не найдена");
         }
         return category.get();
     }
@@ -291,8 +291,9 @@ public class EventServicePrivateImp implements EventServicePrivate {
     private void checkAbilityToUpdate(Event event) {
         if (!(event.getState().equals(String.valueOf(EventStates.PENDING)))
                 && !(event.getState().equals(String.valueOf(EventStates.CANCELED)))) {
-            log.warn("Update is prohibited. event stat: {}", event.getState());
-            throw new ConflictException("States must be" + EventStates.PENDING + " or " + EventStates.CANCELED);
+            log.warn("Обновление невозможно, состояние события: {}", event.getState());
+            throw new ConflictException("Состояние должно быть " + EventStates.PENDING + " или " +
+                    EventStates.CANCELED);
         }
     }
 }

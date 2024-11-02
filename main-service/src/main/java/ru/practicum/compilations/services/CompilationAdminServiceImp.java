@@ -3,8 +3,8 @@ package ru.practicum.compilations.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.errors.NotFoundException;
-import ru.practicum.compilations.CompilationMapper;
+import ru.practicum.exception.NotFoundException;
+import ru.practicum.compilations.mapper.CompilationMapper;
 import ru.practicum.compilations.dto.CompilationRequest;
 import ru.practicum.compilations.dto.CompilationResponse;
 import ru.practicum.compilations.dto.CompilationUpdate;
@@ -13,8 +13,8 @@ import ru.practicum.compilations.model.CompositeKeyForEventByComp;
 import ru.practicum.compilations.model.EventsByCompilation;
 import ru.practicum.compilations.repository.CompilationRepository;
 import ru.practicum.compilations.repository.EventByCompilationRepository;
-import ru.practicum.events.EventMapper;
-import ru.practicum.events.EventRepository;
+import ru.practicum.events.mapper.EventMapper;
+import ru.practicum.events.repository.EventRepository;
 import ru.practicum.events.dto.EventRespShort;
 
 import java.util.List;
@@ -30,19 +30,16 @@ public class CompilationAdminServiceImp implements CompilationAdminService {
     private final CompilationMapper compilationMapper;
     private final EventMapper eventMapper;
 
-    //Data stores normalized in two tables. 1 - compilation (id, title, pinned),
-    // 2 - events_by_compilations (compilation_id, event_id)
     @Override
     public CompilationResponse addCompilation(CompilationRequest compilationRequest) {
         if (compilationRequest.getPinned() == null) {
             compilationRequest.setPinned(false);
         }
 
-        //Save to compilation table
         Compilation savedCompilation = compilationRepository
                 .save(compilationMapper.mapToCompilation(compilationRequest));
 
-        int compilationId = savedCompilation.getId(); //returned compilation_id
+        int compilationId = savedCompilation.getId();
 
         CompilationResponse compilationResponse = compilationMapper.mapToCompilationResponse(savedCompilation);
         if (compilationRequest.getEvents() == null) {
@@ -107,8 +104,8 @@ public class CompilationAdminServiceImp implements CompilationAdminService {
 
     private Compilation validateAndGetCompilation(int id) {
         if (!compilationRepository.existsById(id)) {
-            log.warn("Compilation with: {} was not found", id);
-            throw new NotFoundException("Compilation with = " + id + " was not found");
+            log.warn("Компиляция с id: {} не найдена", id);
+            throw new NotFoundException("Компиляция с id: " + id + " не найдена");
         }
         return compilationRepository.findById(id).orElseThrow();
     }

@@ -14,6 +14,7 @@ import lombok.Data;
 @Table(name = "apps")
 @Data
 public class App {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "app_id")

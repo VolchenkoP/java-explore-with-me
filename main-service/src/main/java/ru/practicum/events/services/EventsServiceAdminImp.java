@@ -5,27 +5,27 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.practicum.categories.CategoriesRepository;
+import ru.practicum.categories.repository.CategoriesRepository;
 import ru.practicum.categories.model.Category;
-import ru.practicum.common.ConnectToStatServer;
-import ru.practicum.common.GeneralConstants;
-import ru.practicum.common.Utilities;
-import ru.practicum.errors.ConflictException;
-import ru.practicum.errors.NotFoundException;
-import ru.practicum.errors.ValidationException;
-import ru.practicum.events.EventRepository;
-import ru.practicum.events.EventStates;
-import ru.practicum.events.LocationRepository;
+import ru.practicum.common.config.ConnectToStatServer;
+import ru.practicum.common.constants.Constants;
+import ru.practicum.common.utilites.Utilities;
+import ru.practicum.exception.ConflictException;
+import ru.practicum.exception.NotFoundException;
+import ru.practicum.exception.ValidationException;
+import ru.practicum.events.repository.EventRepository;
+import ru.practicum.events.model.EventStates;
+import ru.practicum.events.repository.LocationRepository;
 import ru.practicum.events.dto.EventRespFull;
 import ru.practicum.events.dto.EventRespShort;
 import ru.practicum.events.dto.EventUpdate;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.Location;
-import ru.practicum.requests.RequestRepository;
-import ru.practicum.requests.RequestStatus;
+import ru.practicum.requests.repository.RequestRepository;
+import ru.practicum.requests.model.RequestStatus;
 import ru.practicum.requests.dto.EventIdByRequestsCount;
 import ru.practicum.statisticsClient.StatisticClient;
-import ru.practicum.events.EventMapper;
+import ru.practicum.events.mapper.EventMapper;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -92,10 +92,10 @@ public class EventsServiceAdminImp implements EventsServiceAdmin {
             users = List.of();
         }
         if (rangeStart == null) {
-            rangeStart = GeneralConstants.defaultStartTime;
+            rangeStart = Constants.defaultStartTime;
         }
         if (rangeEnd == null) {
-            rangeEnd = GeneralConstants.defaultEndTime;
+            rangeEnd = Constants.defaultEndTime;
         }
 
         List<EventRespFull> eventRespFulls = eventRepository
@@ -114,8 +114,8 @@ public class EventsServiceAdminImp implements EventsServiceAdmin {
                 .stream()
                 .collect(Collectors.toMap(EventIdByRequestsCount::getEvent, EventIdByRequestsCount::getCount));
 
-        List<Long> views = ConnectToStatServer.getViews(GeneralConstants.defaultStartTime,
-                GeneralConstants.defaultEndTime,
+        List<Long> views = ConnectToStatServer.getViews(Constants.defaultStartTime,
+                Constants.defaultEndTime,
                 ConnectToStatServer.prepareUris(eventsIds), true, statisticClient);
 
         List<? extends EventRespShort> events =
@@ -130,8 +130,8 @@ public class EventsServiceAdminImp implements EventsServiceAdmin {
     private Event validateAndGetEvent(long eventId) {
         Optional<Event> event = eventRepository.findById(eventId);
         if (event.isEmpty()) {
-            log.warn("Attempt to get unknown event");
-            throw new NotFoundException("Event with id = " + eventId + "was not found");
+            log.warn("Поиск неизвестного события с id: {}", eventId);
+            throw new NotFoundException("Событие с id: " + eventId + " не найдено");
         }
         return event.get();
     }
@@ -139,8 +139,8 @@ public class EventsServiceAdminImp implements EventsServiceAdmin {
     private Category validateAndGetCategory(int categoryId) {
         Optional<Category> category = categoriesRepository.findById(categoryId);
         if (category.isEmpty()) {
-            log.warn("Attempt to delete unknown category with categoryId: {}", categoryId);
-            throw new NotFoundException("Category with id = " + categoryId + " was not found");
+            log.warn("Поиск неизвестной категории с id: {}", categoryId);
+            throw new NotFoundException("Категория с id = " + categoryId + " не найдена");
         }
         return category.get();
     }
@@ -148,8 +148,9 @@ public class EventsServiceAdminImp implements EventsServiceAdmin {
     private void checkAbilityToUpdate(Event event) {
         if (event.getState().equals(String.valueOf(EventStates.PUBLISHED))
                 || event.getState().equals(String.valueOf(EventStates.CANCELED))) {
-            log.warn("Update is prohibited. event stat: {}", event.getState());
-            throw new ConflictException("States must be" + EventStates.PENDING + " or " + EventStates.CANCELED);
+            log.warn("Обновление события отклонено, состояние события: {}", event.getState());
+            throw new ConflictException("Состояние должно быть " + EventStates.PENDING + " или " +
+                    EventStates.CANCELED);
         }
     }
 
@@ -158,8 +159,8 @@ public class EventsServiceAdminImp implements EventsServiceAdmin {
             return;
         }
         if (start.isAfter(end)) {
-            log.warn("Prohibited. Start is after end. Start: {}, end: {}", start, end);
-            throw new ValidationException("Event must be published");
+            log.warn("Отклонено. начало события позже окончания, начало: {}, окончание: {}", start, end);
+            throw new ValidationException("Событие не опубликовано");
         }
     }
 }

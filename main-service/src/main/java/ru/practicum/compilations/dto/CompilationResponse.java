@@ -15,7 +15,7 @@ public class CompilationResponse {
 
     private Integer id;
 
-    @NotBlank(message = "Empty title")
+    @NotBlank(message = "empty title")
     @Length(max = 50)
     private String title;
 

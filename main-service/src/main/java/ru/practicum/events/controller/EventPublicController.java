@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.StatisticDto;
-import ru.practicum.common.GeneralConstants;
+import ru.practicum.common.constants.Constants;
 import ru.practicum.events.dto.EventRespFull;
 import ru.practicum.events.dto.EventRespShort;
 import ru.practicum.events.services.EventsServicePublic;
@@ -56,17 +56,17 @@ public class EventPublicController {
         String ip = httpServletRequest.getRemoteAddr();
         String path = httpServletRequest.getRequestURI();
 
-        log.info("EventPublicController, searchEvents, search parameters: text: {}, categories: {}, paid: {}," +
-                        "rangeStart: {}, rangeEnd: {}, onlyAvailable: {}, sort: {}, from: {}, size: {}", text, categories,
-                paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
-        log.info("EventPublicController, searchEvents. Requester IP: {}, path: {}", ip, path);
+        log.info("Поиск события по параметрам: text: {}, categories: {}, paid: {}," +
+                        "rangeStart: {}, rangeEnd: {}, onlyAvailable: {}, sort: {}, from: {}, size: {}", text,
+                categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+        log.info("Пользователем с параметрами ip: {}, path: {}", ip, path);
 
         StatisticDto statisticDto = prepareStatisticDto("ewm-main-service", path, ip);
         ResponseEntity<Object> response = statisticClient.addStat(statisticDto);
 
         validateResponses(response);
 
-        log.info("EventPublicController, getEvent. Statistic was sent to stats-server, statisticDto: {}",
+        log.info("В сервер статистики ушел следующий запрос: statisticDto: {}",
                 statisticDto);
 
         LocalDateTime start = convertToLocalDataTime(decode(rangeStart));
@@ -82,14 +82,14 @@ public class EventPublicController {
         String ip = httpServletRequest.getRemoteAddr();
         String path = httpServletRequest.getRequestURI();
 
-        log.info("EventPublicController, getEvent, eventId: {}, requesterIp: {}, path: {}", eventId, ip, path);
+        log.info("Поиск события с параметрами: eventId: {}, requesterIp: {}, path: {}", eventId, ip, path);
 
         StatisticDto statisticDto = prepareStatisticDto("ewm-main-service", path, ip);
         ResponseEntity<Object> response = statisticClient.addStat(statisticDto);
 
         validateResponses(response);
 
-        log.info("EventPublicController, getEvent. Statistic was sent to stats-server, statisticDto: {}",
+        log.info("Следующий запрос ушел в сервис статистики: statisticDto: {}",
                 statisticDto);
         return eventService.getEvent(eventId, path);
     }
@@ -106,12 +106,12 @@ public class EventPublicController {
 
     private void validateResponses(ResponseEntity<?> response) {
         if (response.getStatusCode().is4xxClientError()) {
-            log.error("EventPublicController. Status code: {}, responseBody: {}", response.getStatusCode(),
+            log.error("Ответ пришел с параметрами: Status code: {}, responseBody: {}", response.getStatusCode(),
                     response.getBody());
         }
 
         if (response.getStatusCode().is5xxServerError()) {
-            log.error("EventPublicController. Status code: {}, responseBody: {}", response.getStatusCode(),
+            log.error("Ответ пришел с параметрами: Status code: {}, responseBody: {}", response.getStatusCode(),
                     response.getBody());
         }
     }
@@ -127,6 +127,6 @@ public class EventPublicController {
         if (date == null) {
             return null;
         }
-        return LocalDateTime.parse(date, GeneralConstants.DATE_FORMATTER);
+        return LocalDateTime.parse(date, Constants.DATE_FORMATTER);
     }
 }

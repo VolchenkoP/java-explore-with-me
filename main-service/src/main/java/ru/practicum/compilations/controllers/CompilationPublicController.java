@@ -23,7 +23,7 @@ public class CompilationPublicController {
     @GetMapping("/{compId}")
     @ResponseStatus(HttpStatus.OK)
     public CompilationResponse getCompilationById(@PathVariable("compId") int compId) {
-        log.info("CompilationPublicController, getCompilationById, compId: {}", compId);
+        log.info("Поиск компиляции с id: {}", compId);
         return compilationService.getCompilationById(compId);
     }
 
@@ -34,7 +34,7 @@ public class CompilationPublicController {
                                                      @Min(0) int from,
                                                      @RequestParam(value = "size", defaultValue = "10")
                                                      @Min(0) int size) {
-        log.info("CompilationPublicController, getCompilations, pinned: {}, from: {}, size: {}", pinned, from, size);
+        log.info("Поиск компиляций с параметрами pinned: {}, from: {}, size: {}", pinned, from, size);
         return compilationService.getCompilations(pinned, from, size);
     }
 }

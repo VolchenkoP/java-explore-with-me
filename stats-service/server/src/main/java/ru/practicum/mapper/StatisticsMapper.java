@@ -7,6 +7,7 @@ import ru.practicum.model.Statistics;
 
 @Mapper(componentModel = "spring")
 public interface StatisticsMapper {
+
     @Mapping(target = "app", source = "statistics.app.name")
     StatisticDto toDto(Statistics statistics);
 

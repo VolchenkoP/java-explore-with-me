@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.validator.constraints.Length;
 import ru.practicum.categories.model.Category;
+import ru.practicum.common.constants.Constants;
 import ru.practicum.users.model.User;
 
 import java.time.LocalDateTime;
@@ -22,14 +23,14 @@ public class EventRespShort {
     @Length(min = 20, max = 2000)
     private String annotation;
 
-    @NotNull(message = "Category must be existed")
+    @NotNull(message = "category must be existed")
     private Category category;
 
     @Min(0)
     private Long confirmedRequests;
 
     @NotNull(message = "event date must be existed")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Constants.DATA_PATTERN)
     private LocalDateTime eventDate;
 
     @NotNull

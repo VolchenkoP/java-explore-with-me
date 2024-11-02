@@ -21,7 +21,7 @@ public class CompilationAdminController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CompilationResponse addCompilation(@Valid @RequestBody CompilationRequest compilationRequest) {
-        log.info("CompilationAdminController, addCompilation, compilationRequest: {}", compilationRequest);
+        log.info("Добавление новой компиляции с запросом: {}", compilationRequest);
         return compilationService.addCompilation(compilationRequest);
     }
 
@@ -29,7 +29,7 @@ public class CompilationAdminController {
     @ResponseStatus(HttpStatus.OK)
     public CompilationResponse updateCompilation(@PathVariable("id") int id,
                                                  @Valid @RequestBody CompilationUpdate compilationUpdate) {
-        log.info("CompilationAdminController, updateCompilation, compId: {}, compilationRequest: {}",
+        log.info("Обноление компиляции с id: {} и запросом: {}",
                 id, compilationUpdate);
         return compilationService.updateCompilation(id, compilationUpdate);
     }
@@ -38,7 +38,7 @@ public class CompilationAdminController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCompilation(@PathVariable("id") int id) {
-        log.info("CompilationAdminController, deleteCompilation, id: {}", id);
+        log.info("Удаление компиляции с id: {}", id);
         compilationService.deleteCompilation(id);
     }
 

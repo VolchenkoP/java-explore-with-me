@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.validator.constraints.Length;
+import ru.practicum.common.constants.Constants;
 import ru.practicum.events.model.Location;
 
 import java.time.LocalDateTime;
@@ -17,10 +18,9 @@ import java.time.LocalDateTime;
 @SuperBuilder
 @Data
 public class EventRespFull extends EventRespShort {
-    //Other fields there are in parent
 
-    @NotNull(message = "Empty createdOn")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @NotNull(message = "empty createdOn")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Constants.DATA_PATTERN)
     private LocalDateTime createdOn;
 
     @NotBlank(message = "empty description")
@@ -34,7 +34,7 @@ public class EventRespFull extends EventRespShort {
     private Integer participantLimit;
 
     @NotNull(message = "empty publishedOn")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Constants.DATA_PATTERN)
     private LocalDateTime publishedOn;
 
     private Boolean requestModeration;
