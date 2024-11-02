@@ -15,6 +15,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 public class BaseClient {
+    private static final MediaType MEDIA_TYPE = MediaType.APPLICATION_JSON;
     protected final RestTemplate restTemplate;
 
     protected ResponseEntity<Object> get(String uri, @Nullable Map<String, Object> parameters) {
@@ -35,11 +36,8 @@ public class BaseClient {
                                                         @Nullable T body,
                                                         @Nullable Map<String, Object> parameters,
                                                         ParameterizedTypeReference<F> type) {
-
         HttpEntity<T> request = new HttpEntity<>(body, defaultHeaders());
-
         ResponseEntity<F> response;
-
         if (parameters == null) {
             response = restTemplate.exchange(uri, method, request, type);
         } else {
@@ -48,15 +46,11 @@ public class BaseClient {
         return response;
     }
 
-
     private <T> ResponseEntity<Object> sendRequest(String uri, HttpMethod method,
                                                    @Nullable T body,
                                                    @Nullable Map<String, Object> parameters) {
-
         HttpEntity<T> request = new HttpEntity<>(body, defaultHeaders());
-
         ResponseEntity<Object> response;
-
         if (parameters == null) {
             response = restTemplate.exchange(uri, method, request, Object.class);
         } else {
@@ -67,8 +61,8 @@ public class BaseClient {
 
     private HttpHeaders defaultHeaders() {
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.setContentType(MEDIA_TYPE);
+        headers.setAccept(List.of(MEDIA_TYPE));
         return headers;
     }
 }
