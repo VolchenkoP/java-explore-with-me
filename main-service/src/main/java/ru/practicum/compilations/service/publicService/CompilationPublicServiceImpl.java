@@ -33,6 +33,7 @@ public class CompilationPublicServiceImpl implements CompilationPublicService {
     private final CompilationRepository compilationRepository;
     private final EventsRepository eventRepository;
     private final EventByCompilationRepository eventByCompilationRepository;
+    private final CompilationMapper compilationMapper;
 
     @Override
     public CompilationResponse getCompilationById(int compId) {
@@ -45,7 +46,9 @@ public class CompilationPublicServiceImpl implements CompilationPublicService {
                 .map(EventMapper::toResponseShort)
                 .toList();
 
-        return CompilationMapper.toResponse(compilation, events);
+        CompilationResponse response = compilationMapper.toResponse(compilation);
+        response.setEvents(events);
+        return response;
     }
 
     @Override
@@ -90,7 +93,9 @@ public class CompilationPublicServiceImpl implements CompilationPublicService {
             if (events == null) {
                 events = List.of();
             }
-            compilationResponses.add(CompilationMapper.toResponse(compilation, events));
+            CompilationResponse response = compilationMapper.toResponse(compilation);
+            response.setEvents(events);
+            compilationResponses.add(response);
         }
         return compilationResponses;
     }
