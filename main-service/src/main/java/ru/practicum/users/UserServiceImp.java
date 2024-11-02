@@ -1,9 +1,7 @@
 package ru.practicum.users;
 
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -24,10 +22,11 @@ import java.util.stream.Collectors;
 public class UserServiceImp implements UserService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Override
     public UserDto addUser(UserDto userDto) {
-        return UserMapper.mapToUserDto(userRepository.save(UserMapper.mapToUser(userDto)));
+        return userMapper.mapToUserDto(userRepository.save(userMapper.mapToUser(userDto)));
     }
 
     @Override
@@ -52,14 +51,14 @@ public class UserServiceImp implements UserService {
     private Collection<UserDto> getUsersWithoutIds(Pageable pageable) {
         return userRepository.findAll(pageable)
                 .stream()
-                .map(UserMapper::mapToUserDto)
+                .map(userMapper::mapToUserDto)
                 .collect(Collectors.toList());
     }
 
     private Collection<UserDto> getUsersWithIds(Collection<Integer> ids, Pageable pageable) {
         return userRepository.findByIdIn(List.copyOf(ids), pageable)
                 .stream()
-                .map(UserMapper::mapToUserDto)
+                .map(userMapper::mapToUserDto)
                 .collect(Collectors.toList());
     }
 

@@ -1,8 +1,9 @@
 package ru.practicum.events;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import ru.practicum.categories.model.Category;
+import ru.practicum.events.EventStates;
 import ru.practicum.events.dto.EventRequest;
 import ru.practicum.events.dto.EventRespFull;
 import ru.practicum.events.dto.EventRespShort;
@@ -12,135 +13,86 @@ import ru.practicum.events.services.EventStateAction;
 
 import java.time.LocalDateTime;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class EventMapper {
+@Mapper(componentModel = "spring")
+public interface EventMapper {
 
-    public static Event mapToEvent(EventRequest eventRequest) {
-        return Event
-                .builder()
-                .id(eventRequest.getId())
-                .annotation(eventRequest.getAnnotation())
-                .description(eventRequest.getDescription())
-                .eventDate(eventRequest.getEventDate())
-                .location(eventRequest.getLocation())
-                .paid(eventRequest.getPaid())
-                .participantLimit(eventRequest.getParticipantLimit())
-                .requestModeration(eventRequest.getRequestModeration())
-                .title(eventRequest.getTitle())
-                .build();
-    }
+    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "createdOn", ignore = true)
+    @Mapping(target = "initiator", ignore = true)
+    @Mapping(target = "publishedOn", ignore = true)
+    @Mapping(target = "state", ignore = true)
+    Event mapToEvent(EventRequest request);
 
-    public static EventRequest mapToEventRequest(Event event) {
-        return EventRequest
-                .builder()
-                .id(event.getId())
-                .annotation(event.getAnnotation())
-                .category(event.getCategory().getId())
-                .description(event.getDescription())
-                .eventDate(event.getEventDate())
-                .location(event.getLocation())
-                .paid(event.getPaid())
-                .participantLimit(event.getParticipantLimit())
-                .title(event.getTitle())
-                .initiator(event.getId())
-                .requestModeration(event.getRequestModeration())
-                .createdOn(event.getCreatedOn())
-                .state(event.getState())
-                .build();
-    }
+    @Mapping(target = "category", source = "event.category.id")
+    @Mapping(target = "initiator", source = "event.initiator.id")
+    EventRequest mapToEventRequest(Event event);
 
-    public static EventRespShort mapToEventRespShort(Event event) {
-        return EventRespShort
-                .builder()
-                .id(event.getId())
-                .annotation(event.getAnnotation())
-                .category(event.getCategory())
-                .eventDate(event.getEventDate())
-                .initiator(event.getInitiator())
-                .paid(event.getPaid())
-                .title(event.getTitle())
-                .build();
+    @Mapping(target = "confirmedRequests", ignore = true)
+    @Mapping(target = "views", ignore = true)
+    EventRespShort mapToEventRespShort(Event event);
 
-    }
+    @Mapping(target = "confirmedRequests", ignore = true)
+    @Mapping(target = "views", ignore = true)
+    EventRespFull mapToEventRespFull(Event event);
 
-    public static EventRespFull mapToEventRespFull(Event event) {
-        return EventRespFull
-                .builder()
-                .id(event.getId())
-                .annotation(event.getAnnotation())
-                .category(event.getCategory())
-                .description(event.getDescription())
-                .eventDate(event.getEventDate())
-                .createdOn(event.getCreatedOn())
-                .location(event.getLocation())
-                .paid(event.getPaid())
-                .participantLimit(event.getParticipantLimit())
-                .title(event.getTitle())
-                .initiator(event.getInitiator())
-                .requestModeration(event.getRequestModeration())
-                .publishedOn(event.getPublishedOn())
-                .state(event.getState())
-                .build();
-    }
+    default Event updateEvent(Event event, EventUpdate eventUpdated, Category category) {
 
-    public static Event updateEvent(Event updatingEvent, EventUpdate eventUpdate, Category category) {
-
-        if (eventUpdate.getId() != null) {
-            updatingEvent.setId(eventUpdate.getId());
+        if (eventUpdated.getId() != null) {
+            event.setId(eventUpdated.getId());
         }
 
-        if (eventUpdate.getAnnotation() != null) {
-            updatingEvent.setAnnotation(eventUpdate.getAnnotation());
+        if (eventUpdated.getAnnotation() != null) {
+            event.setAnnotation(eventUpdated.getAnnotation());
         }
 
-        if (eventUpdate.getCategory() != null) {
-            updatingEvent.setCategory(category);
+        if (eventUpdated.getCategory() != null) {
+            event.setCategory(category);
         }
 
-        if (eventUpdate.getDescription() != null) {
-            updatingEvent.setDescription(eventUpdate.getDescription());
+        if (eventUpdated.getDescription() != null) {
+            event.setDescription(eventUpdated.getDescription());
         }
 
-        if (eventUpdate.getLocation() != null) {
-            updatingEvent.setLocation(eventUpdate.getLocation());
+        if (eventUpdated.getLocation() != null) {
+            event.setLocation(eventUpdated.getLocation());
         }
 
-        if (eventUpdate.getPaid() != null) {
-            updatingEvent.setPaid(eventUpdate.getPaid());
+        if (eventUpdated.getPaid() != null) {
+            event.setPaid(eventUpdated.getPaid());
         }
 
-        if (eventUpdate.getParticipantLimit() != null) {
-            updatingEvent.setParticipantLimit(eventUpdate.getParticipantLimit());
+        if (eventUpdated.getParticipantLimit() != null) {
+            event.setParticipantLimit(eventUpdated.getParticipantLimit());
         }
 
-        if (eventUpdate.getRequestModeration() != null) {
-            updatingEvent.setRequestModeration(eventUpdate.getRequestModeration());
+        if (eventUpdated.getRequestModeration() != null) {
+            event.setRequestModeration(eventUpdated.getRequestModeration());
         }
 
-        if (eventUpdate.getTitle() != null) {
-            updatingEvent.setTitle(eventUpdate.getTitle());
+        if (eventUpdated.getTitle() != null) {
+            event.setTitle(eventUpdated.getTitle());
         }
 
-        if (eventUpdate.getCreatedOn() != null) {
-            updatingEvent.setCreatedOn(eventUpdate.getCreatedOn());
+        if (eventUpdated.getCreatedOn() != null) {
+            event.setCreatedOn(eventUpdated.getCreatedOn());
         }
 
-        if (eventUpdate.getStateAction() != null) {
-            if (eventUpdate.getStateAction().equals(String.valueOf(EventStateAction.PUBLISH_EVENT))) {
-                updatingEvent.setState(String.valueOf(EventStates.PUBLISHED));
-                updatingEvent.setPublishedOn(LocalDateTime.now());
+        if (eventUpdated.getStateAction() != null) {
+            if (eventUpdated.getStateAction().equals(String.valueOf(EventStateAction.PUBLISH_EVENT))) {
+                event.setState(String.valueOf(EventStates.PUBLISHED));
+                event.setPublishedOn(LocalDateTime.now());
             }
 
-            if ((eventUpdate.getStateAction().equals(String.valueOf(EventStateAction.REJECT_EVENT)))
-                    || (eventUpdate.getStateAction().equals(String.valueOf(EventStateAction.CANCEL_REVIEW)))) {
-                updatingEvent.setState(String.valueOf(EventStates.CANCELED));
+            if ((eventUpdated.getStateAction().equals(String.valueOf(EventStateAction.REJECT_EVENT)))
+                    || (eventUpdated.getStateAction().equals(String.valueOf(EventStateAction.CANCEL_REVIEW)))) {
+                event.setState(String.valueOf(EventStates.CANCELED));
             }
 
-            if (eventUpdate.getStateAction().equals(String.valueOf(EventStateAction.SEND_TO_REVIEW))) {
-                updatingEvent.setState(String.valueOf(EventStates.PENDING));
+            if (eventUpdated.getStateAction().equals(String.valueOf(EventStateAction.SEND_TO_REVIEW))) {
+                event.setState(String.valueOf(EventStates.PENDING));
             }
 
         }
-        return updatingEvent;
+        return event;
     }
 }

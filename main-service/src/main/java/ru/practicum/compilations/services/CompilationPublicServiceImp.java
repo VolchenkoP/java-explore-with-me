@@ -30,6 +30,8 @@ public class CompilationPublicServiceImp implements CompilationPublicService {
     private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
     private final EventByCompilationRepository eventByCompilationRepository;
+    private final EventMapper eventMapper;
+    private final CompilationMapper compilationMapper;
 
     @Override
     public CompilationResponse getCompilationById(int compId) {
@@ -39,10 +41,12 @@ public class CompilationPublicServiceImp implements CompilationPublicService {
 
         List<EventRespShort> events = eventRepository.findByIdIn(eventIds)
                 .stream()
-                .map(EventMapper::mapToEventRespShort)
+                .map(eventMapper::mapToEventRespShort)
                 .toList();
 
-        return CompilationMapper.mapToCompilationResponse(compilation, events);
+        CompilationResponse compilationResponse = compilationMapper.mapToCompilationResponse(compilation);
+        compilationResponse.setEvents(events);
+        return compilationResponse;
     }
 
     @Override
@@ -66,7 +70,7 @@ public class CompilationPublicServiceImp implements CompilationPublicService {
                 List<EventRespShort> events;
                 if (event != null) {
                     events = new ArrayList<>();
-                    events.add(EventMapper.mapToEventRespShort(eventByCompId.getEvent()));
+                    events.add(eventMapper.mapToEventRespShort(eventByCompId.getEvent()));
                 } else {
                     events = List.of();
                 }
@@ -77,7 +81,7 @@ public class CompilationPublicServiceImp implements CompilationPublicService {
                 continue;
             }
             eventShortListByCompId.get(eventByCompId.getCompilationId())
-                    .add(EventMapper.mapToEventRespShort(eventByCompId.getEvent()));
+                    .add(eventMapper.mapToEventRespShort(eventByCompId.getEvent()));
         }
 
         List<CompilationResponse> compilationResponses = new ArrayList<>();
@@ -87,7 +91,9 @@ public class CompilationPublicServiceImp implements CompilationPublicService {
             if (events == null) {
                 events = List.of();
             }
-            compilationResponses.add(CompilationMapper.mapToCompilationResponse(compilation, events));
+            CompilationResponse compilationResponse = compilationMapper.mapToCompilationResponse(compilation);
+            compilationResponse.setEvents(events);
+            compilationResponses.add(compilationResponse);
         }
         return compilationResponses;
     }

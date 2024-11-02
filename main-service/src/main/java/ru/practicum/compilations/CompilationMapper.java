@@ -1,34 +1,23 @@
 package ru.practicum.compilations;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import ru.practicum.compilations.dto.CompilationRequest;
 import ru.practicum.compilations.dto.CompilationResponse;
 import ru.practicum.compilations.dto.CompilationUpdate;
 import ru.practicum.compilations.model.Compilation;
-import ru.practicum.events.dto.EventRespShort;
 
-import java.util.List;
+@Mapper(componentModel = "spring")
+public interface CompilationMapper {
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CompilationMapper {
+    Compilation mapToCompilation(CompilationRequest request);
 
-    public static Compilation mapToCompilation(CompilationRequest compilationRequest) {
-        return new Compilation(compilationRequest.getId(),
-                compilationRequest.getTitle(), compilationRequest.getPinned());
-    }
+    Compilation mapToCompilation(CompilationUpdate compilationUpdated);
 
-    public static Compilation mapToCompilation(CompilationUpdate compilationUpdate) {
-        return new Compilation(compilationUpdate.getId(),
-                compilationUpdate.getTitle(), compilationUpdate.getPinned());
-    }
+    @Mapping(target = "events", ignore = true)
+    CompilationResponse mapToCompilationResponse(Compilation compilation);
 
-    public static CompilationResponse mapToCompilationResponse(Compilation compilation, List<EventRespShort> events) {
-        return new CompilationResponse(compilation.getId(),
-                compilation.getTitle(), compilation.getPinned(), events);
-    }
-
-    public static Compilation updateCompilation(Compilation updatingCompilation, Compilation newCompilation) {
+    default Compilation updateCompilation(Compilation updatingCompilation, Compilation newCompilation) {
         if (newCompilation.getTitle() != null) {
             updatingCompilation.setTitle(newCompilation.getTitle());
         }

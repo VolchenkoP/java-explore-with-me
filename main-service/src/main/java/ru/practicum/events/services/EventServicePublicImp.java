@@ -35,6 +35,7 @@ public class EventServicePublicImp implements EventsServicePublic {
     private final EventRepository eventRepository;
     private final RequestRepository requestRepository;
     private final StatisticClient statisticClient;
+    private final EventMapper eventMapper;
 
     @Override
     public Collection<EventRespShort> searchEvents(String text, List<Integer> categories, Boolean paid,
@@ -60,7 +61,7 @@ public class EventServicePublicImp implements EventsServicePublic {
         List<EventRespShort> events = eventRepository
                 .searchEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, pageable)
                 .stream()
-                .map(EventMapper::mapToEventRespShort)
+                .map(eventMapper::mapToEventRespShort)
                 .toList();
 
         List<Long> eventsIds = events.stream()
@@ -93,7 +94,7 @@ public class EventServicePublicImp implements EventsServicePublic {
         long confirmedRequests = requestRepository.countByEventIdAndStatus(eventId,
                 String.valueOf(RequestStatus.CONFIRMED));
 
-        EventRespFull eventFull = EventMapper.mapToEventRespFull(event);
+        EventRespFull eventFull = eventMapper.mapToEventRespFull(event);
         eventFull.setConfirmedRequests(confirmedRequests);
         List<Long> views = ConnectToStatServer.getViews(GeneralConstants.defaultStartTime,
                 GeneralConstants.defaultEndTime, path,

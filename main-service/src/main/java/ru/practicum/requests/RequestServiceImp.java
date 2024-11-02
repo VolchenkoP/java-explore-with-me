@@ -25,6 +25,7 @@ public class RequestServiceImp implements RequestService {
     private final RequestRepository requestRepository;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
+    private final RequestMapper requestMapper;
 
     @Override
     public RequestDto addRequest(long eventId, long userId) {
@@ -49,14 +50,14 @@ public class RequestServiceImp implements RequestService {
             addingRequest.setStatus(String.valueOf(RequestStatus.CONFIRMED));
         }
 
-        return RequestMapper.mapToRequestDto(requestRepository.save(addingRequest));
+        return requestMapper.mapToRequestDto(requestRepository.save(addingRequest));
     }
 
     @Override
     public RequestDto cancelRequest(long requestId, long userId) {
         Requests updatingRequest = validateRequest(requestId);
         updatingRequest.setStatus(String.valueOf(RequestStatus.CANCELED));
-        return RequestMapper.mapToRequestDto(requestRepository.save(updatingRequest));
+        return requestMapper.mapToRequestDto(requestRepository.save(updatingRequest));
     }
 
     @Override
@@ -64,7 +65,7 @@ public class RequestServiceImp implements RequestService {
         return requestRepository
                 .findByRequesterId(userId)
                 .stream()
-                .map(RequestMapper::mapToRequestDto)
+                .map(requestMapper::mapToRequestDto)
                 .collect(Collectors.toSet());
     }
 

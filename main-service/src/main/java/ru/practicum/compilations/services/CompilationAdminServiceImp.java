@@ -27,6 +27,8 @@ public class CompilationAdminServiceImp implements CompilationAdminService {
     private final CompilationRepository compilationRepository;
     private final EventByCompilationRepository eventByCompilationRepository;
     private final EventRepository eventRepository;
+    private final CompilationMapper compilationMapper;
+    private final EventMapper eventMapper;
 
     //Data stores normalized in two tables. 1 - compilation (id, title, pinned),
     // 2 - events_by_compilations (compilation_id, event_id)
@@ -38,15 +40,18 @@ public class CompilationAdminServiceImp implements CompilationAdminService {
 
         //Save to compilation table
         Compilation savedCompilation = compilationRepository
-                .save(CompilationMapper.mapToCompilation(compilationRequest));
+                .save(compilationMapper.mapToCompilation(compilationRequest));
 
         int compilationId = savedCompilation.getId(); //returned compilation_id
 
+        CompilationResponse compilationResponse = compilationMapper.mapToCompilationResponse(savedCompilation);
         if (compilationRequest.getEvents() == null) {
-            return CompilationMapper.mapToCompilationResponse(savedCompilation, List.of());
+            compilationResponse.setEvents(List.of());
+            return compilationResponse;
         }
-        return CompilationMapper
-                .mapToCompilationResponse(savedCompilation, addEventByCompilations(compilationRequest, compilationId));
+        List<EventRespShort> eventRespShorts = addEventByCompilations(compilationRequest, compilationId);
+        compilationResponse.setEvents(eventRespShorts);
+        return compilationResponse;
     }
 
     @Override
@@ -54,17 +59,21 @@ public class CompilationAdminServiceImp implements CompilationAdminService {
         Compilation updatingCompilation = validateAndGetCompilation(id);
 
         Compilation updatedCompilation = compilationRepository
-                .save(CompilationMapper
-                        .updateCompilation(updatingCompilation, CompilationMapper.mapToCompilation(compilationUpdate)));
+                .save(compilationMapper
+                        .updateCompilation(updatingCompilation, compilationMapper.mapToCompilation(compilationUpdate)));
 
+        CompilationResponse compilationResponse = compilationMapper.mapToCompilationResponse(updatedCompilation);
         if (compilationUpdate.getEvents() == null) {
-            return CompilationMapper.mapToCompilationResponse(updatedCompilation, List.of());
+            compilationResponse.setEvents(List.of());
+            return compilationResponse;
         }
 
         deleteEventsByCompilations(id);
 
-        return CompilationMapper
-                .mapToCompilationResponse(updatedCompilation, addEventByCompilations(compilationUpdate, id));
+        List<EventRespShort> eventRespShorts = addEventByCompilations(compilationUpdate, id);
+
+        compilationResponse.setEvents(eventRespShorts);
+        return compilationResponse;
     }
 
     @Override
@@ -86,7 +95,7 @@ public class CompilationAdminServiceImp implements CompilationAdminService {
 
         return eventRepository.findByIdIn(compilation.getEvents())
                 .stream()
-                .map(EventMapper::mapToEventRespShort)
+                .map(eventMapper::mapToEventRespShort)
                 .toList();
     }
 

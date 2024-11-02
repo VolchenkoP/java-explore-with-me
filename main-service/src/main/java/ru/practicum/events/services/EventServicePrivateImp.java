@@ -52,6 +52,8 @@ public class EventServicePrivateImp implements EventServicePrivate {
     private final LocationRepository locationRepository;
     private final RequestRepository requestRepository;
     private final StatisticClient statisticClient;
+    private final EventMapper eventMapper;
+    private final RequestMapper requestMapper;
 
     @Override
     public EventRequest createEvent(EventRequest eventRequest, long userId) {
@@ -67,14 +69,14 @@ public class EventServicePrivateImp implements EventServicePrivate {
 
         validateEventDate(eventRequest.getEventDate());
         addLocation(eventRequest.getLocation()); //Adding locations to database because location is separated entity
-        Event addingEvent = EventMapper.mapToEvent(eventRequest);
+        Event addingEvent = eventMapper.mapToEvent(eventRequest);
         addingEvent.setInitiator(validateAndGetUser(userId));
         addingEvent.setCategory(validateAndGetCategory(eventRequest.getCategory()));
         addingEvent.setCreatedOn(LocalDateTime.now());
         addingEvent.setState(String.valueOf(EventStates.PENDING));
 
         Event saved = eventRepository.save(addingEvent);
-        return EventMapper.mapToEventRequest(saved);
+        return eventMapper.mapToEventRequest(saved);
     }
 
     @Override
@@ -84,7 +86,7 @@ public class EventServicePrivateImp implements EventServicePrivate {
 
         List<EventRespShort> events = eventRepository.findByInitiatorId(userId, pageable)
                 .stream()
-                .map(EventMapper::mapToEventRespShort)
+                .map(eventMapper::mapToEventRespShort)
                 .toList();
 
         List<Long> eventIds = events.stream().map(EventRespShort::getId).toList();
@@ -109,7 +111,7 @@ public class EventServicePrivateImp implements EventServicePrivate {
         Event event = validateAndGetEvent(eventId);
         long confirmedRequests = requestRepository
                 .countByEventIdAndStatus(eventId, String.valueOf(RequestStatus.CONFIRMED));
-        EventRespFull eventRespFull = EventMapper.mapToEventRespFull(event);
+        EventRespFull eventRespFull = eventMapper.mapToEventRespFull(event);
         eventRespFull.setConfirmedRequests(confirmedRequests);
         List<Long> views = ConnectToStatServer.getViews(GeneralConstants.defaultStartTime,
                 GeneralConstants.defaultEndTime, path, true, statisticClient);
@@ -135,8 +137,8 @@ public class EventServicePrivateImp implements EventServicePrivate {
             category = validateAndGetCategory(eventUpdate.getCategory());
         }
 
-        Event updatedEvent = eventRepository.save(EventMapper.updateEvent(updatingEvent, eventUpdate, category));
-        return EventMapper.mapToEventRequest(updatedEvent);
+        Event updatedEvent = eventRepository.save(eventMapper.updateEvent(updatingEvent, eventUpdate, category));
+        return eventMapper.mapToEventRequest(updatedEvent);
     }
 
     @Override
@@ -144,7 +146,7 @@ public class EventServicePrivateImp implements EventServicePrivate {
         validateAndGetEvent(eventId);
         return requestRepository.findByEventId(eventId)
                 .stream()
-                .map(RequestMapper::mapToRequestDto)
+                .map(requestMapper::mapToRequestDto)
                 .collect(Collectors.toList());
     }
 
@@ -167,7 +169,7 @@ public class EventServicePrivateImp implements EventServicePrivate {
             List<RequestDto> approvedRequest = requestRepository.saveAll(setStatusToRequests(RequestStatus
                             .valueOf(requestsForConfirmation.getStatus()), requests))
                     .stream()
-                    .map(RequestMapper::mapToRequestDto)
+                    .map(requestMapper::mapToRequestDto)
                     .toList();
             RequestResponse response = RequestResponse.builder().build();
             if (requestsForConfirmation.getStatus().equals(String.valueOf(RequestStatus.REJECTED))) {
@@ -187,13 +189,13 @@ public class EventServicePrivateImp implements EventServicePrivate {
         List<RequestDto> confirmed = requestRepository.saveAll(setStatusToRequests(RequestStatus
                         .valueOf(requestsForConfirmation.getStatus()), requests.subList(0, freeSlots)))
                 .stream()
-                .map(RequestMapper::mapToRequestDto)
+                .map(requestMapper::mapToRequestDto)
                 .toList();
 
         List<RequestDto> rejected = requestRepository.saveAll(setStatusToRequests(RequestStatus.REJECTED,
                         requests.subList(freeSlots, requests.size())))
                 .stream()
-                .map(RequestMapper::mapToRequestDto)
+                .map(requestMapper::mapToRequestDto)
                 .toList();
 
         return RequestResponse

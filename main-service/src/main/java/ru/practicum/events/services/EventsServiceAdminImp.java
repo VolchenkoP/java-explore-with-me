@@ -13,7 +13,6 @@ import ru.practicum.common.Utilities;
 import ru.practicum.errors.ConflictException;
 import ru.practicum.errors.NotFoundException;
 import ru.practicum.errors.ValidationException;
-import ru.practicum.events.EventMapper;
 import ru.practicum.events.EventRepository;
 import ru.practicum.events.EventStates;
 import ru.practicum.events.LocationRepository;
@@ -26,6 +25,7 @@ import ru.practicum.requests.RequestRepository;
 import ru.practicum.requests.RequestStatus;
 import ru.practicum.requests.dto.EventIdByRequestsCount;
 import ru.practicum.statisticsClient.StatisticClient;
+import ru.practicum.events.EventMapper;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -44,6 +44,7 @@ public class EventsServiceAdminImp implements EventsServiceAdmin {
     private final CategoriesRepository categoriesRepository;
     private final RequestRepository requestRepository;
     private final StatisticClient statisticClient;
+    private final EventMapper eventMapper;
 
     @Override
     public EventRespFull adminsUpdate(EventUpdate eventUpdate, long eventId) {
@@ -61,11 +62,10 @@ public class EventsServiceAdminImp implements EventsServiceAdmin {
             addLocation(eventUpdate.getLocation());
         }
 
-        Event updatedEvent = eventRepository.save(EventMapper
-                .updateEvent(updatingEvent, eventUpdate, category));
+        Event updatedEvent = eventRepository.save(eventMapper.updateEvent(updatingEvent, eventUpdate, category));
         long confirmedRequests = requestRepository
                 .countByEventIdAndStatus(eventId, String.valueOf(RequestStatus.CONFIRMED));
-        EventRespFull eventFull = EventMapper.mapToEventRespFull(updatedEvent);
+        EventRespFull eventFull = eventMapper.mapToEventRespFull(updatedEvent);
         eventFull.setConfirmedRequests(confirmedRequests);
         return eventFull;
     }
@@ -101,7 +101,7 @@ public class EventsServiceAdminImp implements EventsServiceAdmin {
         List<EventRespFull> eventRespFulls = eventRepository
                 .findByConditionals(states, categories, users, rangeStart, rangeEnd, pageable)
                 .stream()
-                .map(EventMapper::mapToEventRespFull)
+                .map(eventMapper::mapToEventRespFull)
                 .toList();
 
         List<Long> eventsIds = eventRespFulls

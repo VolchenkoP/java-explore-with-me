@@ -1,18 +1,13 @@
 package ru.practicum.users;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import org.mapstruct.Mapper;
 import ru.practicum.users.dto.UserDto;
 import ru.practicum.users.model.User;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class UserMapper {
+@Mapper(componentModel = "spring")
+public interface UserMapper {
 
-    public static User mapToUser(UserDto userDto) {
-        return new User(userDto.getId(), userDto.getEmail(), userDto.getName());
-    }
+    UserDto mapToUserDto(User user);
 
-    public static UserDto mapToUserDto(User user) {
-        return new UserDto(user.getId(), user.getEmail(), user.getName());
-    }
+    User mapToUser(UserDto userDto);
 }

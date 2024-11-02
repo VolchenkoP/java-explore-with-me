@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.errors.NotFoundException;
 import ru.practicum.categories.dto.CategoryDto;
 import ru.practicum.categories.model.Category;
+import ru.practicum.categories.CategoriesMapper;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -21,18 +22,19 @@ import java.util.stream.Collectors;
 public class CategoriesServiceImp implements CategoriesService {
 
     private final CategoriesRepository categoriesRepository;
+    private final CategoriesMapper categoriesMapper;
 
     @Override
     public CategoryDto addCategory(@Valid CategoryDto categoryDto) {
-        return CategoriesMapper
-                .mapToCategoryDto(categoriesRepository.save(CategoriesMapper.mapToCategory(categoryDto)));
+        return categoriesMapper
+                .mapToCategoryDto(categoriesRepository.save(categoriesMapper.mapToCategory(categoryDto)));
     }
 
     @Override
     public CategoryDto updateCategory(CategoryDto categoryDto, int categoryId) {
         Category updatingCategory = validateCategory(categoryId);
         updatingCategory.setName(categoryDto.getName());
-        return CategoriesMapper.mapToCategoryDto(categoriesRepository.save(updatingCategory));
+        return categoriesMapper.mapToCategoryDto(categoriesRepository.save(updatingCategory));
     }
 
     @Override
@@ -48,14 +50,14 @@ public class CategoriesServiceImp implements CategoriesService {
         Pageable pageable = PageRequest.of(startPage, size, sortById);
         return categoriesRepository.findAll(pageable)
                 .stream()
-                .map(CategoriesMapper::mapToCategoryDto)
+                .map(categoriesMapper::mapToCategoryDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public CategoryDto getCategoryById(int categoryId) {
         Category category = validateCategory(categoryId);
-        return CategoriesMapper.mapToCategoryDto(category);
+        return categoriesMapper.mapToCategoryDto(category);
     }
 
     private Category validateCategory(int categoryId) {

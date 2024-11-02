@@ -1,21 +1,16 @@
 package ru.practicum.requests;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import ru.practicum.requests.dto.RequestDto;
 import ru.practicum.requests.model.Requests;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class RequestMapper {
+@Mapper(componentModel = "spring")
+public interface RequestMapper {
 
-    public static RequestDto mapToRequestDto(Requests requests) {
-        return RequestDto
-                .builder()
-                .id(requests.getId())
-                .created(requests.getCreated())
-                .event(requests.getEvent().getId())
-                .requester(requests.getRequester().getId())
-                .status(requests.getStatus())
-                .build();
-    }
+    @Mapping(target = "event", source = "request.event.id")
+    @Mapping(target = "requester", source = "request.requester.id")
+    RequestDto mapToRequestDto(Requests request);
+
+
 }
