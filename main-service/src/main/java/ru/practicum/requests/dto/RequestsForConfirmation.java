@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 @Builder
 public class RequestsForConfirmation {
-    private List<Long> requestIds;
+
+    private List<Long> requestsId;
     private String status;
 }
