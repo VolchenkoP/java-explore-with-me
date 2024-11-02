@@ -113,7 +113,6 @@ public class EventsAdminServiceImpl implements EventsAdminService {
                 .stream()
                 .collect(Collectors.toMap(EventIdByRequestsCount::getEvent,
                         EventIdByRequestsCount::getCount));
-        System.out.println(confirmedRequestsByEvents.keySet());
 
         List<Long> views = ConnectStatsServer.getViews(Constants.defaultStartTime,
                 Constants.defaultEndTime,
@@ -121,8 +120,6 @@ public class EventsAdminServiceImpl implements EventsAdminService {
 
         List<? extends EventResponseShort> events =
                 Utilities.addViewsAndConfirmedRequests(eventRespFulls, confirmedRequestsByEvents, views);
-        System.out.println(events);
-        System.out.println(events.get(0).getConfirmedRequests());
         return Utilities.checkTypes(events, EventResponse.class);
     }
 

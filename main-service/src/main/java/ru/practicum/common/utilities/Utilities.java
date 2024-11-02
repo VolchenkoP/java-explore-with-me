@@ -24,7 +24,8 @@ public class Utilities {
                 eventRespShorts.get(i).setViews(0L);
             }
             eventRespShorts.get(i)
-                    .setConfirmedRequests(confirmedRequests.computeIfAbsent(eventRespShorts.get(i).getId(), id -> 0L));
+                    .setConfirmedRequests(confirmedRequests
+                            .getOrDefault(eventRespShorts.get(i).getId(), 0L));
         }
         return eventRespShorts;
     }
