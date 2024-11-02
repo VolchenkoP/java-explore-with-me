@@ -1,19 +1,14 @@
 package ru.practicum.categories.mapper;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import org.mapstruct.Mapper;
 import ru.practicum.categories.dto.CategoryDto;
 import ru.practicum.categories.model.Category;
 
+@Mapper(componentModel = "spring")
+public interface CategoriesMapper {
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CategoriesMapper {
+    CategoryDto toDto(Category category);
 
-    public static Category toEntity(CategoryDto categoryDto) {
-        return new Category(categoryDto.getId(), categoryDto.getName());
-    }
+    Category toEntity(CategoryDto dto);
 
-    public static CategoryDto toDto(Category category) {
-        return new CategoryDto(category.getId(), category.getName());
-    }
 }

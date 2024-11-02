@@ -24,10 +24,11 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Override
     public UserDto addUser(UserDto userDto) {
-        return UserMapper.toUserDto(userRepository.save(UserMapper.toUserEntity(userDto)));
+        return userMapper.toUserDto(userRepository.save(userMapper.toUserEntity(userDto)));
     }
 
     @Override
@@ -52,14 +53,14 @@ public class UserServiceImpl implements UserService {
     private Collection<UserDto> getUsersWithoutIds(Pageable pageable) {
         return userRepository.findAll(pageable)
                 .stream()
-                .map(UserMapper::toUserDto)
+                .map(userMapper::toUserDto)
                 .collect(Collectors.toList());
     }
 
     private Collection<UserDto> getUsersWithIds(Collection<Integer> ids, Pageable pageable) {
         return userRepository.findByIdIn(List.copyOf(ids), pageable)
                 .stream()
-                .map(UserMapper::toUserDto)
+                .map(userMapper::toUserDto)
                 .collect(Collectors.toList());
     }
 
