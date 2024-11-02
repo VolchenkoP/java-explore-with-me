@@ -18,7 +18,7 @@ import ru.practicum.events.mapper.EventMapper;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.EventStates;
 import ru.practicum.events.model.Location;
-import ru.practicum.events.repository.EventRepository;
+import ru.practicum.events.repository.EventsRepository;
 import ru.practicum.events.repository.LocationRepository;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
@@ -29,7 +29,7 @@ import ru.practicum.requests.dto.RequestsForConfirmation;
 import ru.practicum.requests.mapper.RequestMapper;
 import ru.practicum.requests.model.RequestStatus;
 import ru.practicum.requests.model.Requests;
-import ru.practicum.requests.repository.RequestRepository;
+import ru.practicum.requests.repository.RequestsRepository;
 import ru.practicum.statisticsClient.StatisticsClient;
 import ru.practicum.users.model.User;
 import ru.practicum.users.repository.UserRepository;
@@ -46,11 +46,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class EventPrivateServiceImpl implements EventPrivateService {
 
-    private final EventRepository eventRepository;
+    private final EventsRepository eventRepository;
     private final UserRepository userRepository;
     private final CategoriesRepository categoriesRepository;
     private final LocationRepository locationRepository;
-    private final RequestRepository requestRepository;
+    private final RequestsRepository requestRepository;
     private final StatisticsClient statisticClient;
 
     @Override
@@ -94,11 +94,16 @@ public class EventPrivateServiceImpl implements EventPrivateService {
                 .stream()
                 .collect(Collectors.toMap(EventIdByRequestsCount::getEvent, EventIdByRequestsCount::getCount));
 
+        System.out.println(confirmedRequestsByEvents);
+
         List<Long> views = ConnectStatsServer.getViews(Constants.defaultStartTime, Constants.defaultEndTime,
                 ConnectStatsServer.prepareUris(eventIds), true, statisticClient);
 
         List<? extends EventResponseShort> eventsForResp =
                 Utilities.addViewsAndConfirmedRequests(events, confirmedRequestsByEvents, views);
+
+        System.out.println(eventsForResp);
+        System.out.println(eventsForResp.get(0).getConfirmedRequests());
 
         return Utilities.checkTypes(eventsForResp,
                 EventResponseShort.class);
@@ -223,14 +228,13 @@ public class EventPrivateServiceImpl implements EventPrivateService {
         }
     }
 
-    //Two pointers to checking request`s status
     private void checkRequestStatus(List<Requests> request) {
         int leftIdx = 0;
         int rightIdx = request.size() - 1;
         while (leftIdx <= rightIdx) {
 
             if (!request.get(leftIdx).getStatus().equals(RequestStatus.PENDING.name())) {
-                log.warn("Status must be PENDING");
+                log.warn("Status must being PENDING");
                 throw new ConflictException("Request with id = " + request.get(leftIdx).getId() + " has status: "
                         + request.get(leftIdx).getStatus());
             }
@@ -290,8 +294,7 @@ public class EventPrivateServiceImpl implements EventPrivateService {
         if (!(event.getState().equals(String.valueOf(EventStates.PENDING)))
                 && !(event.getState().equals(String.valueOf(EventStates.CANCELED)))) {
             log.warn("Update is prohibited. event stat: {}", event.getState());
-            throw new ConflictException("States must be" + EventStates.PENDING + " or " + EventStates.CANCELED);
+            throw new ConflictException("States must be " + EventStates.PENDING + " or " + EventStates.CANCELED);
         }
     }
 }
-

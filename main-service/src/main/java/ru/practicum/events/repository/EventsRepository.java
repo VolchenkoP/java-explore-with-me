@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface EventRepository extends JpaRepository<Event, Long> {
+public interface EventsRepository extends JpaRepository<Event, Long> {
 
     List<Event> findByIdIn(List<Long> id);
 

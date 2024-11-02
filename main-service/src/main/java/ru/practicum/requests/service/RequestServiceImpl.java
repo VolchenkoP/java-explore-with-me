@@ -5,14 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.EventStates;
-import ru.practicum.events.repository.EventRepository;
+import ru.practicum.events.repository.EventsRepository;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.requests.dto.RequestDto;
 import ru.practicum.requests.mapper.RequestMapper;
 import ru.practicum.requests.model.RequestStatus;
 import ru.practicum.requests.model.Requests;
-import ru.practicum.requests.repository.RequestRepository;
+import ru.practicum.requests.repository.RequestsRepository;
 import ru.practicum.users.model.User;
 import ru.practicum.users.repository.UserRepository;
 
@@ -27,9 +27,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class RequestServiceImpl implements RequestService {
 
-    private final RequestRepository requestRepository;
+    private final RequestsRepository requestRepository;
     private final UserRepository userRepository;
-    private final EventRepository eventRepository;
+    private final EventsRepository eventRepository;
 
     private static void sortByRequesterIdAndEventId(List<Requests> list) {
         list.sort((Requests req1, Requests req2) -> {
@@ -161,7 +161,7 @@ public class RequestServiceImpl implements RequestService {
         Optional<Event> event = eventRepository.findById(eventId);
 
         if (event.isEmpty()) {
-            log.warn("Attempt to get unknown events");
+            log.warn("Attempt to get unknown event");
             throw new NotFoundException("Event with id = " + eventId + " was not found");
         }
         return event.get();

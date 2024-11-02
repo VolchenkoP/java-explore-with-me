@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Repository
-public interface RequestRepository extends JpaRepository<Requests, Long> {
+public interface RequestsRepository extends JpaRepository<Requests, Long> {
 
     Collection<Requests> findByEventId(long eventId);
 

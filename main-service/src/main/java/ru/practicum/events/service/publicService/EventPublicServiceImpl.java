@@ -13,12 +13,12 @@ import ru.practicum.events.dto.EventResponseShort;
 import ru.practicum.events.mapper.EventMapper;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.EventStates;
-import ru.practicum.events.repository.EventRepository;
+import ru.practicum.events.repository.EventsRepository;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.ValidationException;
 import ru.practicum.requests.dto.EventIdByRequestsCount;
 import ru.practicum.requests.model.RequestStatus;
-import ru.practicum.requests.repository.RequestRepository;
+import ru.practicum.requests.repository.RequestsRepository;
 import ru.practicum.statisticsClient.StatisticsClient;
 
 import java.time.LocalDateTime;
@@ -32,8 +32,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class EventPublicServiceImpl implements EventPublicService {
 
-    private final EventRepository eventRepository;
-    private final RequestRepository requestRepository;
+    private final EventsRepository eventRepository;
+    private final RequestsRepository requestRepository;
     private final StatisticsClient statisticClient;
 
     @Override
@@ -72,12 +72,17 @@ public class EventPublicServiceImpl implements EventPublicService {
                 .stream()
                 .collect(Collectors.toMap(EventIdByRequestsCount::getEvent, EventIdByRequestsCount::getCount));
 
+        System.out.println(confirmedRequestsByEvents);
+
         List<Long> views = ConnectStatsServer.getViews(Constants.defaultStartTime,
                 Constants.defaultEndTime, ConnectStatsServer.prepareUris(eventsIds),
                 true, statisticClient);
 
         List<? extends EventResponseShort> eventsForResp =
                 Utilities.addViewsAndConfirmedRequests(events, confirmedRequestsByEvents, views);
+
+        System.out.println(eventsForResp);
+        System.out.println(eventsForResp.getFirst().getConfirmedRequests());
 
         return Utilities.checkTypes(eventsForResp, EventResponseShort.class);
     }
@@ -115,4 +120,3 @@ public class EventPublicServiceImpl implements EventPublicService {
         }
     }
 }
-

@@ -14,7 +14,7 @@ import ru.practicum.compilations.repository.CompilationRepository;
 import ru.practicum.compilations.repository.EventByCompilationRepository;
 import ru.practicum.events.dto.EventResponseShort;
 import ru.practicum.events.mapper.EventMapper;
-import ru.practicum.events.repository.EventRepository;
+import ru.practicum.events.repository.EventsRepository;
 import ru.practicum.exception.NotFoundException;
 
 import java.util.List;
@@ -26,7 +26,7 @@ public class CompilationAdminServiceImpl implements CompilationAdminService {
 
     private final CompilationRepository compilationRepository;
     private final EventByCompilationRepository eventByCompilationRepository;
-    private final EventRepository eventRepository;
+    private final EventsRepository eventRepository;
 
     @Override
     public CompilationResponse addCompilation(CompilationRequest compilationRequest) {
