@@ -55,7 +55,7 @@ public class EventServicePublicImp implements EventsServicePublic {
             rangeStart = LocalDateTime.now();
         }
         if (rangeEnd == null) {
-            rangeEnd = Constants.defaultEndTime;
+            rangeEnd = Constants.DEFAULT_END_TIME;
         }
 
         List<EventRespShort> events = eventRepository
@@ -73,8 +73,8 @@ public class EventServicePublicImp implements EventsServicePublic {
                 .stream()
                 .collect(Collectors.toMap(EventIdByRequestsCount::getEvent, EventIdByRequestsCount::getCount));
 
-        List<Long> views = ConnectToStatServer.getViews(Constants.defaultStartTime,
-                Constants.defaultEndTime, ConnectToStatServer.prepareUris(eventsIds),
+        List<Long> views = ConnectToStatServer.getViews(Constants.DEFAULT_START_TIME,
+                Constants.DEFAULT_END_TIME, ConnectToStatServer.prepareUris(eventsIds),
                 true, statisticClient);
 
         List<? extends EventRespShort> eventsForResp =
@@ -96,8 +96,8 @@ public class EventServicePublicImp implements EventsServicePublic {
 
         EventRespFull eventFull = eventMapper.mapToEventRespFull(event);
         eventFull.setConfirmedRequests(confirmedRequests);
-        List<Long> views = ConnectToStatServer.getViews(Constants.defaultStartTime,
-                Constants.defaultEndTime, path,
+        List<Long> views = ConnectToStatServer.getViews(Constants.DEFAULT_START_TIME,
+                Constants.DEFAULT_END_TIME, path,
                 true, statisticClient);
         if (views.isEmpty()) {
             eventFull.setViews(0L);

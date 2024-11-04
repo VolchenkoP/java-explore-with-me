@@ -41,7 +41,6 @@ public class CompilationAdminController {
         return compilationService.updateCompilation(id, compilationUpdate);
     }
 
-
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCompilation(@PathVariable("id") int id) {

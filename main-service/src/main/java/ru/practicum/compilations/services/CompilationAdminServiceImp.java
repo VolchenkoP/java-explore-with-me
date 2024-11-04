@@ -3,6 +3,7 @@ package ru.practicum.compilations.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.compilations.dto.CompilationRequest;
 import ru.practicum.compilations.dto.CompilationResponse;
 import ru.practicum.compilations.dto.CompilationUpdate;
@@ -22,6 +23,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class CompilationAdminServiceImp implements CompilationAdminService {
 
     private final CompilationRepository compilationRepository;
@@ -31,6 +33,7 @@ public class CompilationAdminServiceImp implements CompilationAdminService {
     private final EventMapper eventMapper;
 
     @Override
+    @Transactional
     public CompilationResponse addCompilation(CompilationRequest compilationRequest) {
         if (compilationRequest.getPinned() == null) {
             compilationRequest.setPinned(false);
@@ -52,12 +55,12 @@ public class CompilationAdminServiceImp implements CompilationAdminService {
     }
 
     @Override
+    @Transactional
     public CompilationResponse updateCompilation(int id, CompilationUpdate compilationUpdate) {
         Compilation updatingCompilation = validateAndGetCompilation(id);
 
-        Compilation updatedCompilation = compilationRepository
-                .save(compilationMapper
-                        .updateCompilation(updatingCompilation, compilationMapper.mapToCompilation(compilationUpdate)));
+        Compilation updatedCompilation = compilationMapper
+                .updateCompilation(updatingCompilation, compilationMapper.mapToCompilation(compilationUpdate));
 
         CompilationResponse compilationResponse = compilationMapper.mapToCompilationResponse(updatedCompilation);
         if (compilationUpdate.getEvents() == null) {
@@ -74,12 +77,14 @@ public class CompilationAdminServiceImp implements CompilationAdminService {
     }
 
     @Override
+    @Transactional
     public void deleteCompilation(int id) {
         validateAndGetCompilation(id);
         compilationRepository.deleteById(id);
         deleteEventsByCompilations(id);
     }
 
+    @Transactional
     private <T extends CompilationUpdate> List<EventRespShort> addEventByCompilations(T compilation, int id) {
 
         List<EventsByCompilation> eventsByComp = compilation
@@ -96,6 +101,7 @@ public class CompilationAdminServiceImp implements CompilationAdminService {
                 .toList();
     }
 
+    @Transactional
     private void deleteEventsByCompilations(int id) {
         if (!eventByCompilationRepository.findByCompilationId(id).isEmpty()) {
             eventByCompilationRepository.deleteByCompilationId(id);

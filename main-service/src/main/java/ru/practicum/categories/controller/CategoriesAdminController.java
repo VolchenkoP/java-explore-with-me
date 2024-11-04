@@ -25,7 +25,7 @@ public class CategoriesAdminController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CategoryDto addNewCategory(@Valid @RequestBody CategoryDto categoryDto) {
+    public CategoryDto addCategory(@Valid @RequestBody CategoryDto categoryDto) {
         log.info("Добавление новой категории с параметрами id: {}. name: {}",
                 categoryDto.getId(), categoryDto.getName());
         return categoriesService.addCategory(categoryDto);

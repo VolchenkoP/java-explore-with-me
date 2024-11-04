@@ -46,11 +46,11 @@ public class EventPublicController {
                                                    String rangeStart,
                                                    @RequestParam(value = "rangeEnd", required = false)
                                                    String rangeEnd,
-                                                   @RequestParam(value = "onlyAvailable", required = false,
+                                                   @RequestParam(value = "onlyAvailable",
                                                            defaultValue = "false") boolean onlyAvailable,
                                                    @RequestParam(value = "sort", required = false) String sort,
                                                    @Min(0) @RequestParam(value = "from", defaultValue = "0") int from,
-                                                   @Min(0) @RequestParam(value = "size", defaultValue = "10") int size,
+                                                   @Min(1) @RequestParam(value = "size", defaultValue = "10") int size,
                                                    HttpServletRequest httpServletRequest) {
 
         String ip = httpServletRequest.getRemoteAddr();

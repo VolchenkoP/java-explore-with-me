@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.categories.model.Category;
 import ru.practicum.categories.repository.CategoriesRepository;
 import ru.practicum.common.config.ConnectToStatServer;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class EventsServiceAdminImp implements EventsServiceAdmin {
 
     private final EventRepository eventRepository;
@@ -47,6 +49,7 @@ public class EventsServiceAdminImp implements EventsServiceAdmin {
     private final EventMapper eventMapper;
 
     @Override
+    @Transactional
     public EventRespFull adminsUpdate(EventUpdate eventUpdate, long eventId) {
         Event updatingEvent = validateAndGetEvent(eventId);
 
@@ -62,7 +65,7 @@ public class EventsServiceAdminImp implements EventsServiceAdmin {
             addLocation(eventUpdate.getLocation());
         }
 
-        Event updatedEvent = eventRepository.save(eventMapper.updateEvent(updatingEvent, eventUpdate, category));
+        Event updatedEvent = eventMapper.updateEvent(updatingEvent, eventUpdate, category); //eventRepository.save()
         long confirmedRequests = requestRepository
                 .countByEventIdAndStatus(eventId, String.valueOf(RequestStatus.CONFIRMED));
         EventRespFull eventFull = eventMapper.mapToEventRespFull(updatedEvent);
@@ -92,10 +95,10 @@ public class EventsServiceAdminImp implements EventsServiceAdmin {
             users = List.of();
         }
         if (rangeStart == null) {
-            rangeStart = Constants.defaultStartTime;
+            rangeStart = Constants.DEFAULT_START_TIME;
         }
         if (rangeEnd == null) {
-            rangeEnd = Constants.defaultEndTime;
+            rangeEnd = Constants.DEFAULT_END_TIME;
         }
 
         List<EventRespFull> eventRespFulls = eventRepository
@@ -114,8 +117,8 @@ public class EventsServiceAdminImp implements EventsServiceAdmin {
                 .stream()
                 .collect(Collectors.toMap(EventIdByRequestsCount::getEvent, EventIdByRequestsCount::getCount));
 
-        List<Long> views = ConnectToStatServer.getViews(Constants.defaultStartTime,
-                Constants.defaultEndTime,
+        List<Long> views = ConnectToStatServer.getViews(Constants.DEFAULT_START_TIME,
+                Constants.DEFAULT_END_TIME,
                 ConnectToStatServer.prepareUris(eventsIds), true, statisticClient);
 
         List<? extends EventRespShort> events =

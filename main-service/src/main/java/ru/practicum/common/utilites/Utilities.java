@@ -1,19 +1,18 @@
 package ru.practicum.common.utilites;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import ru.practicum.events.dto.EventRespShort;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Utilities {
 
-    public static List<? extends EventRespShort> addViewsAndConfirmedRequests(List<? extends EventRespShort> eventRespShorts,
-                                                                              Map<Long, Long> confirmedRequests,
-                                                                              List<Long> views) {
+    public static List<? extends EventRespShort> addViewsAndConfirmedRequests(
+            List<? extends EventRespShort> eventRespShorts,
+            Map<Long, Long> confirmedRequests,
+            List<Long> views) {
+
         for (int i = 0; i < eventRespShorts.size(); i++) {
             if ((!views.isEmpty()) && (views.get(i) != 0)) {
                 eventRespShorts.get(i).setViews(views.get(i));

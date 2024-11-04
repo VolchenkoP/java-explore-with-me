@@ -3,6 +3,7 @@ package ru.practicum.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.StatisticDto;
 import ru.practicum.StatisticResponse;
 import ru.practicum.constants.Constants;
@@ -22,12 +23,14 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class StatisticsServiceImpl implements StatisticsService {
     private final StatisticsRepository statisticsRepository;
     private final AppRepository appRepository;
     private final StatisticsMapper mapper;
 
     @Override
+    @Transactional
     public StatisticDto createStatistics(StatisticDto dto) {
         App app = validationApp(dto.getApp());
         Statistics statistics = mapper.toEntity(dto);

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.categories.model.Category;
 import ru.practicum.categories.repository.CategoriesRepository;
 import ru.practicum.common.config.ConnectToStatServer;
@@ -44,6 +45,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class EventServicePrivateImp implements EventServicePrivate {
 
     private final EventRepository eventRepository;
@@ -56,6 +58,7 @@ public class EventServicePrivateImp implements EventServicePrivate {
     private final RequestMapper requestMapper;
 
     @Override
+    @Transactional
     public EventRequest createEvent(EventRequest eventRequest, long userId) {
         if (eventRequest.getRequestModeration() == null) {
             eventRequest.setRequestModeration(true);
@@ -96,7 +99,7 @@ public class EventServicePrivateImp implements EventServicePrivate {
                 .stream()
                 .collect(Collectors.toMap(EventIdByRequestsCount::getEvent, EventIdByRequestsCount::getCount));
 
-        List<Long> views = ConnectToStatServer.getViews(Constants.defaultStartTime, Constants.defaultEndTime,
+        List<Long> views = ConnectToStatServer.getViews(Constants.DEFAULT_START_TIME, Constants.DEFAULT_END_TIME,
                 ConnectToStatServer.prepareUris(eventIds), true, statisticClient);
 
         List<? extends EventRespShort> eventsForResp =
@@ -113,17 +116,18 @@ public class EventServicePrivateImp implements EventServicePrivate {
                 .countByEventIdAndStatus(eventId, String.valueOf(RequestStatus.CONFIRMED));
         EventRespFull eventRespFull = eventMapper.mapToEventRespFull(event);
         eventRespFull.setConfirmedRequests(confirmedRequests);
-        List<Long> views = ConnectToStatServer.getViews(Constants.defaultStartTime,
-                Constants.defaultEndTime, path, true, statisticClient);
+        List<Long> views = ConnectToStatServer.getViews(Constants.DEFAULT_START_TIME,
+                Constants.DEFAULT_END_TIME, path, true, statisticClient);
         if (views.isEmpty()) {
             eventRespFull.setViews(0L);
             return eventRespFull;
         }
-        eventRespFull.setViews(views.get(0));
+        eventRespFull.setViews(views.getFirst());
         return eventRespFull;
     }
 
     @Override
+    @Transactional
     public EventRequest updateUsersEvent(long userId, long eventId, EventUpdate eventUpdate) {
         Event updatingEvent = validateAndGetEvent(eventId);
         checkAbilityToUpdate(updatingEvent);
@@ -137,7 +141,7 @@ public class EventServicePrivateImp implements EventServicePrivate {
             category = validateAndGetCategory(eventUpdate.getCategory());
         }
 
-        Event updatedEvent = eventRepository.save(eventMapper.updateEvent(updatingEvent, eventUpdate, category));
+        Event updatedEvent = eventMapper.updateEvent(updatingEvent, eventUpdate, category);
         return eventMapper.mapToEventRequest(updatedEvent);
     }
 
@@ -151,6 +155,7 @@ public class EventServicePrivateImp implements EventServicePrivate {
     }
 
     @Override
+    @Transactional
     public RequestResponse approveRequests(RequestsForConfirmation requestsForConfirmation,
                                            long userId,
                                            long eventId) {
@@ -166,8 +171,8 @@ public class EventServicePrivateImp implements EventServicePrivate {
         int freeSlots = event.getParticipantLimit() - participants;
 
         if (freeSlots >= requests.size()) {
-            List<RequestDto> approvedRequest = requestRepository.saveAll(setStatusToRequests(RequestStatus
-                            .valueOf(requestsForConfirmation.getStatus()), requests))
+            List<RequestDto> approvedRequest = setStatusToRequests(RequestStatus
+                    .valueOf(requestsForConfirmation.getStatus()), requests) // тут убрал requestRepository.saveAll()
                     .stream()
                     .map(requestMapper::mapToRequestDto)
                     .toList();
@@ -184,16 +189,16 @@ public class EventServicePrivateImp implements EventServicePrivate {
 
         List<Requests> requestsToCancel = setStatusToRequests(RequestStatus.REJECTED,
                 requests.subList(freeSlots, requests.size()));
-        requestRepository.saveAll(requestsToCancel);
+        // requestRepository.saveAll(requestsToCancel); коментил
 
-        List<RequestDto> confirmed = requestRepository.saveAll(setStatusToRequests(RequestStatus
-                        .valueOf(requestsForConfirmation.getStatus()), requests.subList(0, freeSlots)))
+        List<RequestDto> confirmed = setStatusToRequests(RequestStatus
+                .valueOf(requestsForConfirmation.getStatus()), requests.subList(0, freeSlots)) // requestRepository.saveAll()
                 .stream()
                 .map(requestMapper::mapToRequestDto)
                 .toList();
 
-        List<RequestDto> rejected = requestRepository.saveAll(setStatusToRequests(RequestStatus.REJECTED,
-                        requests.subList(freeSlots, requests.size())))
+        List<RequestDto> rejected = setStatusToRequests(RequestStatus.REJECTED,
+                requests.subList(freeSlots, requests.size())) //requestRepository.saveAll()
                 .stream()
                 .map(requestMapper::mapToRequestDto)
                 .toList();
@@ -225,7 +230,6 @@ public class EventServicePrivateImp implements EventServicePrivate {
         }
     }
 
-    //Two pointers to checking request`s status
     private void checkRequestStatus(List<Requests> request) {
         int leftIdx = 0;
         int rightIdx = request.size() - 1;

@@ -3,6 +3,7 @@ package ru.practicum.requests.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.model.EventStates;
 import ru.practicum.events.repository.EventRepository;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class RequestServiceImp implements RequestService {
 
     private final RequestRepository requestRepository;
@@ -75,6 +77,7 @@ public class RequestServiceImp implements RequestService {
     }
 
     @Override
+    @Transactional
     public RequestDto addRequest(long eventId, long userId) {
         Event event = validateEvent(eventId);
         User user = validateUser(userId);
@@ -101,10 +104,11 @@ public class RequestServiceImp implements RequestService {
     }
 
     @Override
+    @Transactional
     public RequestDto cancelRequest(long requestId, long userId) {
         Requests updatingRequest = validateRequest(requestId);
         updatingRequest.setStatus(String.valueOf(RequestStatus.CANCELED));
-        return requestMapper.mapToRequestDto(requestRepository.save(updatingRequest));
+        return requestMapper.mapToRequestDto(updatingRequest); // requestRepository.save()
     }
 
     @Override

@@ -38,7 +38,7 @@ public class CompilationPublicController {
                                                      @RequestParam(value = "from", defaultValue = "0")
                                                      @Min(0) int from,
                                                      @RequestParam(value = "size", defaultValue = "10")
-                                                     @Min(0) int size) {
+                                                     @Min(1) int size) {
         log.info("Поиск компиляций с параметрами pinned: {}, from: {}, size: {}", pinned, from, size);
         return compilationService.getCompilations(pinned, from, size);
     }

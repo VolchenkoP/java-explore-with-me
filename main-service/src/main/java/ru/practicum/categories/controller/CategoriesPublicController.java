@@ -30,7 +30,7 @@ public class CategoriesPublicController {
     public Collection<CategoryDto> getAllCategories(@RequestParam(value = "from", defaultValue = "0")
                                                     @Min(0) int from,
                                                     @RequestParam(value = "size", defaultValue = "10")
-                                                    @Min(0) int size) {
+                                                    @Min(1) int size) {
         log.info("Поиск категорий с параметрами from: {}, size: {}", from, size);
         return categoriesService.getAllCategories(from, size);
     }

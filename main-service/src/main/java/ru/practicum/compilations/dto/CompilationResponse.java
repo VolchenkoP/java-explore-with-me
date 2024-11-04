@@ -1,10 +1,7 @@
 package ru.practicum.compilations.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.hibernate.validator.constraints.Length;
 import ru.practicum.events.dto.EventRespShort;
 
 import java.util.List;
@@ -15,11 +12,11 @@ public class CompilationResponse {
 
     private Integer id;
 
-    @NotBlank(message = "empty title")
-    @Length(max = 50)
+    // @NotBlank(message = "empty title")
+    // @Length(max = 50)
     private String title;
 
-    @NotNull(message = "Pinned must not be null")
+    // @NotNull(message = "pinned must not be null")
     private Boolean pinned;
 
     private List<EventRespShort> events;

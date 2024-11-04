@@ -53,7 +53,7 @@ public class EventAdminController {
             @RequestParam(value = "rangeEnd", required = false) @DateTimeFormat(
                     pattern = Constants.DATA_PATTERN) LocalDateTime rangeEnd,
             @Min(0) @RequestParam(value = "from", defaultValue = "0") int from,
-            @Min(0) @RequestParam(value = "size", defaultValue = "10") int size) {
+            @Min(1) @RequestParam(value = "size", defaultValue = "10") int size) {
 
         log.info("Поиск администратором события по параметрам users: {}, states: {}," +
                         "categories: {}, rangeStart: {}, rangeEnd: {}, from: {}, size: {}", users, states,

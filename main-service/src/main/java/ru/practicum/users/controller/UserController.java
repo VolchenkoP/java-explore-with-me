@@ -41,7 +41,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public Collection<UserDto> getUsers(@RequestParam(value = "ids", required = false) Set<Integer> ids,
                                         @Min(0) @RequestParam(value = "from", defaultValue = "0") int from,
-                                        @Min(0) @RequestParam(value = "size", defaultValue = "10") int size) {
+                                        @Min(1) @RequestParam(value = "size", defaultValue = "10") int size) {
         log.info("Поиск пользователей по параметрам ids: {}, from: {}, size: {}", ids, from, size);
         return userService.getUsers(ids, from, size);
     }
