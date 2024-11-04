@@ -39,7 +39,6 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -159,7 +158,7 @@ public class EventServicePrivateImp implements EventServicePrivate {
     public RequestResponse approveRequests(RequestsForConfirmation requestsForConfirmation,
                                            long userId,
                                            long eventId) {
-        Event event = validateAndGetEvent(eventId); //checking event availability
+        Event event = validateAndGetEvent(eventId);
 
         List<Requests> requests = requestRepository
                 .findByIdInAndEventId(requestsForConfirmation.getRequestIds(), eventId);
@@ -172,7 +171,7 @@ public class EventServicePrivateImp implements EventServicePrivate {
 
         if (freeSlots >= requests.size()) {
             List<RequestDto> approvedRequest = setStatusToRequests(RequestStatus
-                    .valueOf(requestsForConfirmation.getStatus()), requests) // тут убрал requestRepository.saveAll()
+                    .valueOf(requestsForConfirmation.getStatus()), requests)
                     .stream()
                     .map(requestMapper::mapToRequestDto)
                     .toList();
@@ -189,10 +188,9 @@ public class EventServicePrivateImp implements EventServicePrivate {
 
         List<Requests> requestsToCancel = setStatusToRequests(RequestStatus.REJECTED,
                 requests.subList(freeSlots, requests.size()));
-        // requestRepository.saveAll(requestsToCancel); коментил
 
         List<RequestDto> confirmed = setStatusToRequests(RequestStatus
-                .valueOf(requestsForConfirmation.getStatus()), requests.subList(0, freeSlots)) // requestRepository.saveAll()
+                .valueOf(requestsForConfirmation.getStatus()), requests.subList(0, freeSlots))
                 .stream()
                 .map(requestMapper::mapToRequestDto)
                 .toList();
@@ -263,33 +261,21 @@ public class EventServicePrivateImp implements EventServicePrivate {
     }
 
     private Event validateAndGetEvent(long eventId) {
-        Optional<Event> event = eventRepository.findById(eventId);
 
-        if (event.isEmpty()) {
-            log.warn("Обращение к неизвестному событию");
-            throw new NotFoundException("Событие с id = " + eventId + " не найдено");
-        }
-        return event.get();
+        return eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Событие с id = " + eventId + " не найдено"));
     }
 
     private User validateAndGetUser(long userId) {
-        Optional<User> user = userRepository.findById(userId);
 
-        if (user.isEmpty()) {
-            log.warn("Попытка поиска неизвестного пользователя");
-            throw new NotFoundException("Пользователь с id = " + userId + " не найден");
-        }
-        return user.get();
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id = " + userId + " не найден"));
     }
 
     private Category validateAndGetCategory(int categoryId) {
-        Optional<Category> category = categoriesRepository.findById(categoryId);
 
-        if (category.isEmpty()) {
-            log.warn("Попытка поиска неизвестной категорию с id: {}", categoryId);
-            throw new NotFoundException("Категория с id = " + categoryId + " не найдена");
-        }
-        return category.get();
+        return categoriesRepository.findById(categoryId)
+                .orElseThrow(() -> new NotFoundException("Категория с id = " + categoryId + " не найдена"));
     }
 
     private void checkAbilityToUpdate(Event event) {

@@ -15,7 +15,6 @@ import ru.practicum.categories.repository.CategoriesRepository;
 import ru.practicum.exception.NotFoundException;
 
 import java.util.Collection;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,12 +66,8 @@ public class CategoriesServiceImp implements CategoriesService {
     }
 
     private Category validateCategory(int categoryId) {
-        Optional<Category> category = categoriesRepository.findById(categoryId);
 
-        if (category.isEmpty()) {
-            log.warn("Попытка удалить несуществующую категорию с id: {}", categoryId);
-            throw new NotFoundException("Категория с id = " + categoryId + " не найдена");
-        }
-        return category.get();
+        return categoriesRepository.findById(categoryId)
+                .orElseThrow(() -> new NotFoundException("Категория с id = " + categoryId + " не найдена"));
     }
 }

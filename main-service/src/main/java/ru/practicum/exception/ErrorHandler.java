@@ -17,7 +17,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorMessage handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
+    public ErrorMessage handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         String reason = e.getBody().getDetail();
         String field;
         if (!Objects.requireNonNull(e.getBindingResult().getFieldError()).getField().isEmpty()) {
@@ -32,7 +32,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorMessage handleConflict(final ConflictException e) {
+    public ErrorMessage handleConflict(ConflictException e) {
         String reason = "Integrity constraint has been violated";
         String message = e.getMessage();
         return new ErrorMessage(HttpStatus.CONFLICT.getReasonPhrase(), reason, message, prepareResponseDate());
@@ -40,7 +40,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorMessage handleConflict(final DataIntegrityViolationException e) {
+    public ErrorMessage handleConflict(DataIntegrityViolationException e) {
         String reason = "Ограничение целостности нарушено";
         String message = "Не удалось выполнить, ограничение: " + e.getMostSpecificCause();
         return new ErrorMessage(HttpStatus.CONFLICT.getReasonPhrase(), reason, message, prepareResponseDate());
@@ -48,7 +48,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorMessage handleNotFoundException(final NotFoundException e) {
+    public ErrorMessage handleNotFoundException(NotFoundException e) {
         String reason = "Объект поиска не найден.";
         String message = e.getMessage();
         return new ErrorMessage(HttpStatus.NOT_FOUND.getReasonPhrase(), reason, message, prepareResponseDate());
@@ -56,7 +56,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorMessage handleValidationException(final ValidationException e) {
+    public ErrorMessage handleValidationException(ValidationException e) {
         String reason = "Неправильный запрос.";
         String message = e.getMessage();
         return new ErrorMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), reason, message, prepareResponseDate());
@@ -64,7 +64,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorMessage handleMissingServletRequestParameterException(final MissingServletRequestParameterException e) {
+    public ErrorMessage handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
         String reason = "Неправильный запрос.";
         String message = e.getMessage();
         return new ErrorMessage(HttpStatus.BAD_REQUEST.getReasonPhrase(), reason, message, prepareResponseDate());
@@ -72,7 +72,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorMessage handleThrowable(final Throwable e) {
+    public ErrorMessage handleThrowable(Throwable e) {
         String reason = "Внутренняя ошибка сервера";
         String message = e.getMessage();
         return new ErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),

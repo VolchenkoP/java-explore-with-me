@@ -32,7 +32,6 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,7 +64,7 @@ public class EventsServiceAdminImp implements EventsServiceAdmin {
             addLocation(eventUpdate.getLocation());
         }
 
-        Event updatedEvent = eventMapper.updateEvent(updatingEvent, eventUpdate, category); //eventRepository.save()
+        Event updatedEvent = eventMapper.updateEvent(updatingEvent, eventUpdate, category);
         long confirmedRequests = requestRepository
                 .countByEventIdAndStatus(eventId, String.valueOf(RequestStatus.CONFIRMED));
         EventRespFull eventFull = eventMapper.mapToEventRespFull(updatedEvent);
@@ -131,21 +130,15 @@ public class EventsServiceAdminImp implements EventsServiceAdmin {
     }
 
     private Event validateAndGetEvent(long eventId) {
-        Optional<Event> event = eventRepository.findById(eventId);
-        if (event.isEmpty()) {
-            log.warn("Поиск неизвестного события с id: {}", eventId);
-            throw new NotFoundException("Событие с id: " + eventId + " не найдено");
-        }
-        return event.get();
+
+        return eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Событие с id: " + eventId + " не найдено"));
     }
 
     private Category validateAndGetCategory(int categoryId) {
-        Optional<Category> category = categoriesRepository.findById(categoryId);
-        if (category.isEmpty()) {
-            log.warn("Поиск неизвестной категории с id: {}", categoryId);
-            throw new NotFoundException("Категория с id = " + categoryId + " не найдена");
-        }
-        return category.get();
+
+        return categoriesRepository.findById(categoryId)
+                .orElseThrow(() -> new NotFoundException("Категория с id = " + categoryId + " не найдена"));
     }
 
     private void checkAbilityToUpdate(Event event) {

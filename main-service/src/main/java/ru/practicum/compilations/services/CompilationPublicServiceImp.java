@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -60,7 +59,6 @@ public class CompilationPublicServiceImp implements CompilationPublicService {
         int startPage = from > 0 ? (from / size) : 0;
         Pageable pageable = PageRequest.of(startPage, size);
 
-        //Find all compilations
         Map<Integer, Compilation> compilationMap = compilationRepository.findAll(pageable)
                 .stream()
                 .collect(Collectors.toMap(Compilation::getId, Function.identity()));
@@ -105,12 +103,8 @@ public class CompilationPublicServiceImp implements CompilationPublicService {
     }
 
     private Compilation validateAndCompilation(int compId) {
-        Optional<Compilation> compilation = compilationRepository.findById(compId);
 
-        if (compilation.isEmpty()) {
-            log.warn("Компиляция с id: {} не найдена", compId);
-            throw new NotFoundException("Компиляция с id: " + compId + " не найдена");
-        }
-        return compilation.get();
+        return compilationRepository.findById(compId)
+                .orElseThrow(() -> new NotFoundException("Компиляция с id: " + compId + " не найдена"));
     }
 }

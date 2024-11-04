@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-
 public class EventRequest {
 
     private Long id;

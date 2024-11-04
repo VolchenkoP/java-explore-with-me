@@ -20,7 +20,6 @@ import ru.practicum.users.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -108,7 +107,7 @@ public class RequestServiceImp implements RequestService {
     public RequestDto cancelRequest(long requestId, long userId) {
         Requests updatingRequest = validateRequest(requestId);
         updatingRequest.setStatus(String.valueOf(RequestStatus.CANCELED));
-        return requestMapper.mapToRequestDto(updatingRequest); // requestRepository.save()
+        return requestMapper.mapToRequestDto(updatingRequest);
     }
 
     @Override
@@ -153,33 +152,21 @@ public class RequestServiceImp implements RequestService {
     }
 
     private Requests validateRequest(long requestId) {
-        Optional<Requests> request = requestRepository.findById(requestId);
 
-        if (request.isEmpty()) {
-            log.warn("Невозможно найти событие по запросу");
-            throw new NotFoundException("Запрос с id = " + request + " не найден");
-        }
-        return request.get();
+        return requestRepository.findById(requestId)
+                .orElseThrow(() -> new NotFoundException("Запрос с id = " + requestId + " не найден"));
     }
 
     private Event validateEvent(long eventId) {
-        Optional<Event> event = eventRepository.findById(eventId);
 
-        if (event.isEmpty()) {
-            log.warn("Невозможно найти событие с id: {}", eventId);
-            throw new NotFoundException("Событие с id: " + eventId + " не найдено");
-        }
-        return event.get();
+        return eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Событие с id: " + eventId + " не найдено"));
     }
 
     private User validateUser(long userId) {
-        Optional<User> user = userRepository.findById(userId);
 
-        if (user.isEmpty()) {
-            log.warn("Невозможно найти пользователя с id: {}", userId);
-            throw new NotFoundException("Пользователь с id = " + userId + " не найден");
-        }
-        return user.get();
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id = " + userId + " не найден"));
     }
 }
 

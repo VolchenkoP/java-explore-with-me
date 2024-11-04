@@ -11,12 +11,10 @@ import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.ValidationException;
 import ru.practicum.users.dto.UserDto;
 import ru.practicum.users.mapper.UserMapper;
-import ru.practicum.users.model.User;
 import ru.practicum.users.repository.UserRepository;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -76,10 +74,7 @@ public class UserServiceImp implements UserService {
     }
 
     private void isUserExisted(long userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            log.warn("Невозможно найти пользователя с id: {}", userId);
-            throw new NotFoundException("Пользователь с id: " + userId + " не найден");
-        }
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id: " + userId + " не найден"));
     }
 }
