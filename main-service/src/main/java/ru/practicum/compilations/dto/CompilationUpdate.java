@@ -14,11 +14,9 @@ public class CompilationUpdate {
 
     private Integer id;
 
-    @NotBlank(message = "empty title")
     @Length(max = 50)
     private String title;
-
-    @NotNull(message = "pinned must not be null")
+    
     private Boolean pinned;
 
     private List<Long> events;
