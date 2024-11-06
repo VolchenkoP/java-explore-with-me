@@ -124,31 +124,31 @@ public class SubscriptionServiceImp implements SubscriptionsService {
 
     private void validateSubscription(long userId, long followerId) {
         if (userId == followerId) {
-            log.warn("User with userId: {} tried to follow to himself(followerId: {})", userId, followerId);
-            throw new ConflictException("User with userId: " + userId + " tried to follow to himself(followerId: "
+            log.warn("Попытка пользователя с id: {} подписаться на себя)", userId);
+            throw new ConflictException("Пользователь с id: " + userId + " пытается подписаться на себя (followerId: "
                     + followerId + ")");
         }
 
         Optional<Subscription> subscription = subscriptionRepository.findByUserIdAndFollowerId(userId, followerId);
         if (subscription.isPresent()) {
-            log.warn("User with id: {} have already subscribed to user with id: {}", followerId, userId);
-            throw new ConflictException("User with id: " + followerId +
-                    " have already subscribed to user with id: " + userId);
+            log.warn("Пользователь с id: {} уже подписан на пользователя с id: {}", followerId, userId);
+            throw new ConflictException("Пользователь с id: " + followerId +
+                    " уже подписан на пользователя с id: " + userId);
         }
     }
 
     private User validateAndGetUser(long userId) {
         return userRepository.findById(userId).orElseThrow(() -> {
-            log.warn("Attempt to delete unknown user");
-            return new NotFoundException("User with id = " + userId + " was not found");
+            log.warn("Поиск несуществующего пользователя с id: {}", userId);
+            return new NotFoundException("Пользователь с id = " + userId + " не существует");
         });
     }
 
     private Subscription validateAndGetSubscription(long userId, long followerId) {
         return subscriptionRepository.findByUserIdAndFollowerId(userId, followerId).orElseThrow(() -> {
-            log.warn("User with id: {} does not subscribe to user with id: {}", followerId, userId);
-            return new NotFoundException("User with id: " + followerId +
-                    " does not subscribe to user with id: " + userId);
+            log.warn("Пользователь с id: {} не подписан на пользователя с id: {}", followerId, userId);
+            return new NotFoundException("Пользователь с id: " + followerId +
+                    " не подписан на пользователя с id: " + userId);
         });
     }
 }

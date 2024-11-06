@@ -30,7 +30,7 @@ public class SubscriptionsController {
     @ResponseStatus(HttpStatus.CREATED)
     public SubscriptionDto subscribeToUser(@PathVariable(name = "userId") long userId,
                                            @PathVariable(name = "followerId") long followerId) {
-        log.info("SubscriptionsController, subscribeToUser, userId: {}, followerId: {}", userId, followerId);
+        log.info("Добавление подписки на пользователя с id: {}, пользователем с id: {}", userId, followerId);
         return subscriptionsService.subscribeToUser(userId, followerId);
 
     }
@@ -39,7 +39,7 @@ public class SubscriptionsController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void cancelSubscribe(@PathVariable(name = "userId") long userId,
                                 @PathVariable(name = "followerId") long followerId) {
-        log.info("SubscriptionsController, cancelSubscribe, userId: {}, followerId: {}", userId, followerId);
+        log.info("Отмена подписки на пользователя с id: {}, пользователем с id: {}", userId, followerId);
         subscriptionsService.cancelSubscribe(userId, followerId);
 
     }
@@ -47,14 +47,14 @@ public class SubscriptionsController {
     @GetMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public List<UserDto> getUsersIFollow(@PathVariable(name = "userId") long userId) {
-        log.info("SubscriptionsController, getUsersIFollow, userId: {}", userId);
+        log.info("Поиск подписчиков пользователя с id: {}", userId);
         return subscriptionsService.getUsersIFollow(userId);
     }
 
     @GetMapping("/{userId}/followers")
     @ResponseStatus(HttpStatus.OK)
     public List<UserDto> getMyFollowers(@PathVariable(name = "userId") long userId) {
-        log.info("SubscriptionsController, getMyFollowers, userId: {}", userId);
+        log.info("Поиск пользователем с id: {} подписчиков", userId);
         return subscriptionsService.getMyFollowers(userId);
     }
 
@@ -63,7 +63,7 @@ public class SubscriptionsController {
     public List<EventRespShort> getUsersEvents(@PathVariable(name = "userId") long userId,
                                                @RequestParam(value = "from", defaultValue = "0") int from,
                                                @RequestParam(value = "size", defaultValue = "10") int size) {
-        log.info("SubscriptionsController, getUsersEvents, userId: {}. From: {}, size: {}", userId, from, size);
+        log.info("Поиск событий пользователя с id: {} и параметрами from: {}, size: {}", userId, from, size);
         return subscriptionsService.getUsersEvents(userId, from, size);
     }
 }

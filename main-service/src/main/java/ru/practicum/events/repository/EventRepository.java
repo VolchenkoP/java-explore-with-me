@@ -33,27 +33,20 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                                    @Param("rangeEnd") LocalDateTime rangeEnd,
                                    Pageable pageable);
 
-    @Query(value = "SELECT * FROM events AS e " +
-            "WHERE (((e.annotation ILIKE :text OR e.description ILIKE :text) OR :text IS NULL) " +
-            "AND (:category IN :categories OR :category IS NULL) " +
-            "AND (e.paid = CAST(:paid AS boolean) OR :paid IS NULL) " +
-            "AND (e.event_date BETWEEN :startDate AND :endDate ) " +
-            "AND (:isAvailable IS TRUE " +
+    @Query(value = "SELECT * " +
+            "FROM events AS e " +
+            "WHERE (((e.annotation ILIKE %?1% OR e.description ILIKE %?1%) OR ?1 IS NULL) " +
+            "AND (e.category IN (?2) OR ?2 IS NULL) " +
+            "AND (e.paid = CAST(?3 AS boolean) OR ?3 IS NULL) " +
+            "AND (e.event_date BETWEEN ?4 AND ?5 ) " +
+            "AND (CAST(?6 AS BOOLEAN) is TRUE " +
             "  OR( " +
             "  select count(id) " +
             "  from requests AS r " +
-            "  WHERE r.event = e.id) < participantsLimit) " +
-            "AND state = 'PUBLISHED' " +
-            "ORDER BY e.id LIMIT :size OFFSET :offset",
+            "  WHERE r.event = e.id) < participants_limit) " +
+            "AND state = 'PUBLISHED') ",
             nativeQuery = true)
-    List<Event> searchEvents(
-            @Param("text") String text,
-            @Param("categories") List<Integer> categories,
-            @Param("paid") Boolean paid,
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate,
-            @Param("isAvailable") boolean isAvailable,
-            @Param("size") int size,
-            @Param("offset") int startPaige);
+    List<Event> searchEvents(String text, List<Integer> category, Boolean paid, LocalDateTime rangStart,
+                             LocalDateTime rangeEnd, boolean isAvailable, Pageable pageable);
 }
 
