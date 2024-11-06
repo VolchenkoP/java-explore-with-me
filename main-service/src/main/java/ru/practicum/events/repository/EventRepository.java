@@ -33,26 +33,27 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                                    @Param("rangeEnd") LocalDateTime rangeEnd,
                                    Pageable pageable);
 
-    @Query(value = "SELECT * " +
-            "FROM events AS e " +
-            "WHERE (((e.annotation ILIKE CONCAT('%', :text, '%') OR e.description ILIKE CONCAT('%', :text, '%')) OR :text IS NULL) " +
-            "AND (e.category IN (:category) OR :category IS NULL) " +
+    @Query(value = "SELECT * FROM events AS e " +
+            "WHERE (((e.annotation ILIKE :text OR e.description ILIKE :text) OR :text IS NULL) " +
+            "AND (:category IN :categories OR :category IS NULL) " +
             "AND (e.paid = CAST(:paid AS boolean) OR :paid IS NULL) " +
-            "AND (e.event_date BETWEEN :rangStart AND :rangeEnd) " +
-            "AND (:isAvailable is TRUE " +
-            "OR (" +
-            "select count(id) " +
-            "from requests AS r " +
-            "WHERE r.event = e.id)) < participants_limit) " +
-            "AND state = 'PUBLISHED')",
+            "AND (e.event_date BETWEEN :startDate AND :endDate ) " +
+            "AND (:isAvailable IS TRUE " +
+            "  OR( " +
+            "  select count(id) " +
+            "  from requests AS r " +
+            "  WHERE r.event = e.id) < participantsLimit) " +
+            "AND state = 'PUBLISHED' " +
+            "ORDER BY e.id LIMIT :size OFFSET :offset",
             nativeQuery = true)
     List<Event> searchEvents(
             @Param("text") String text,
-            @Param("category") List<Integer> category,
+            @Param("categories") List<Integer> categories,
             @Param("paid") Boolean paid,
-            @Param("rangStart") LocalDateTime rangStart,
-            @Param("rangeEnd") LocalDateTime rangeEnd,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
             @Param("isAvailable") boolean isAvailable,
-            Pageable pageable);
+            @Param("size") int size,
+            @Param("offset") int startPaige);
 }
 

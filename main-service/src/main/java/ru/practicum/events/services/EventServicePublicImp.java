@@ -3,8 +3,6 @@ package ru.practicum.events.services;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.practicum.StatisticDto;
@@ -69,7 +67,6 @@ public class EventServicePublicImp implements EventsServicePublic {
 
         validateDates(start, end);
         int startPage = from > 0 ? (from / size) : 0;
-        Pageable pageable = PageRequest.of(startPage, size);
 
         if (text == null) {
             text = "";
@@ -85,7 +82,7 @@ public class EventServicePublicImp implements EventsServicePublic {
         }
 
         List<EventRespShort> events = eventRepository
-                .searchEvents(text, categories, paid, start, end, onlyAvailable, pageable)
+                .searchEvents(text, categories, paid, start, end, onlyAvailable, size, startPage)
                 .stream()
                 .map(eventMapper::mapToEventRespShort)
                 .toList();
