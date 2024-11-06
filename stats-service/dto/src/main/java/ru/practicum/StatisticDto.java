@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class StatisticsDto {
+public class StatisticDto {
 
     @NotBlank
     private String app;

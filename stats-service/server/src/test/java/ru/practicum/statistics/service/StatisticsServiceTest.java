@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.StatisticsDto;
-import ru.practicum.StatisticsResponse;
+import ru.practicum.StatisticDto;
+import ru.practicum.StatisticResponse;
 import ru.practicum.constants.Constants;
 import ru.practicum.model.App;
 import ru.practicum.service.StatisticsService;
@@ -25,10 +25,10 @@ import static org.hamcrest.Matchers.equalTo;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class StatisticsServiceTest {
 
-    private static StatisticsDto statEvent1;
-    private static StatisticsDto statEvent2;
-    private static StatisticsDto statEvent3;
-    private static StatisticsDto statEvent4;
+    private static StatisticDto statEvent1;
+    private static StatisticDto statEvent2;
+    private static StatisticDto statEvent3;
+    private static StatisticDto statEvent4;
     private static App mainApp;
     private static String start = "2000-01-01 11:11:11";
     private static String end = "3000-01-01 11:11:11";
@@ -41,7 +41,7 @@ public class StatisticsServiceTest {
         mainApp.setId(1L);
         mainApp.setName("ewm-main-service");
 
-        statEvent1 = StatisticsDto
+        statEvent1 = StatisticDto
                 .builder()
                 .uri("event/1")
                 .ip("1")
@@ -49,7 +49,7 @@ public class StatisticsServiceTest {
                 .timestamp((LocalDateTime.parse("2023-10-06 22:00:23", Constants.DATE_FORMATTER)))
                 .build();
 
-        statEvent2 = StatisticsDto
+        statEvent2 = StatisticDto
                 .builder()
                 .uri("event/2")
                 .ip("1")
@@ -57,7 +57,7 @@ public class StatisticsServiceTest {
                 .timestamp((LocalDateTime.parse("2023-11-06 20:00:23", Constants.DATE_FORMATTER)))
                 .build();
 
-        statEvent3 = StatisticsDto
+        statEvent3 = StatisticDto
                 .builder()
                 .uri("event/1")
                 .ip("2")
@@ -65,7 +65,7 @@ public class StatisticsServiceTest {
                 .timestamp((LocalDateTime.parse("2022-11-06 22:00:23", Constants.DATE_FORMATTER)))
                 .build();
 
-        statEvent4 = StatisticsDto
+        statEvent4 = StatisticDto
                 .builder()
                 .uri("event/")
                 .ip("2")
@@ -85,7 +85,7 @@ public class StatisticsServiceTest {
     @Test
     void shouldGetStatForAllEndPointsAndAllIp() {
 
-        List<StatisticsResponse> stats = statisticService.getStatistics(start, end, null, false);
+        List<StatisticResponse> stats = statisticService.getStatistics(start, end, null, false);
         assertThat(stats.size(), equalTo(3));
         assertThat(stats.get(0).getUri(), equalTo(statEvent1.getUri()));
         assertThat(stats.get(0).getHits(), equalTo(2L));
@@ -101,7 +101,7 @@ public class StatisticsServiceTest {
     @Test
     void shouldGetStatForAllEndPointsAndUniqueIp() {
 
-        List<StatisticsResponse> stats = statisticService.getStatistics(start, end, null, true);
+        List<StatisticResponse> stats = statisticService.getStatistics(start, end, null, true);
 
         assertThat(stats.size(), equalTo(3));
         assertThat(stats.get(0).getUri(), equalTo(statEvent1.getUri()));
@@ -117,7 +117,7 @@ public class StatisticsServiceTest {
     @Test
     void shouldGetStatForEndPointsListAndAllIp() {
 
-        List<StatisticsResponse> stats = statisticService.getStatistics(start, end, List.of("event/1"), false);
+        List<StatisticResponse> stats = statisticService.getStatistics(start, end, List.of("event/1"), false);
 
         assertThat(stats.size(), equalTo(1));
         assertThat(stats.get(0).getUri(), equalTo(statEvent1.getUri()));
@@ -126,7 +126,7 @@ public class StatisticsServiceTest {
 
     @Test
     void shouldGetStatForEndPointsListAndUniqueIp() {
-        List<StatisticsResponse> stats = statisticService.getStatistics(start, end, List.of("event/1", "events/2", "event/"), true);
+        List<StatisticResponse> stats = statisticService.getStatistics(start, end, List.of("event/1", "events/2", "event/"), true);
 
         assertThat(stats.size(), equalTo(2));
         assertThat(stats.get(0).getUri(), equalTo(statEvent1.getUri()));

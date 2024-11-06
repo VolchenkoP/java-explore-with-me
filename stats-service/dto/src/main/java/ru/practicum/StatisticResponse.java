@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class StatisticsResponse {
+public class StatisticResponse {
     private Object app;
     private String uri;
     private Long hits;
