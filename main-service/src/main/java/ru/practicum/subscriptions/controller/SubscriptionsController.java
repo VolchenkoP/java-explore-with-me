@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.events.dto.EventRespShort;
-import ru.practicum.subscriptions.service.SubscriptionsService;
 import ru.practicum.subscriptions.dto.SubscriptionDto;
+import ru.practicum.subscriptions.service.SubscriptionsService;
 import ru.practicum.users.dto.UserDto;
 
 import java.util.List;
