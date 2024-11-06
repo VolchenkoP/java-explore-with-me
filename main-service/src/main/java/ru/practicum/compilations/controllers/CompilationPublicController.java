@@ -1,6 +1,8 @@
 package ru.practicum.compilations.controllers;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -36,9 +38,9 @@ public class CompilationPublicController {
     @ResponseStatus(HttpStatus.OK)
     public List<CompilationResponse> getCompilations(@RequestParam(value = "pinned", required = false) boolean pinned,
                                                      @RequestParam(value = "from", defaultValue = "0")
-                                                     @Min(0) int from,
+                                                     @PositiveOrZero int from,
                                                      @RequestParam(value = "size", defaultValue = "10")
-                                                     @Min(1) int size) {
+                                                     @Positive int size) {
         log.info("Поиск компиляций с параметрами pinned: {}, from: {}, size: {}", pinned, from, size);
         return compilationService.getCompilations(pinned, from, size);
     }

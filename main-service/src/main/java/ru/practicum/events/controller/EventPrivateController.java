@@ -3,6 +3,8 @@ package ru.practicum.events.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -48,9 +50,9 @@ public class EventPrivateController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Collection<EventRespShort> getUsersEvents(@PathVariable(value = "userId") long userId,
-                                                     @Min(0) @RequestParam(
+                                                     @PositiveOrZero @RequestParam(
                                                              value = "from", defaultValue = "0") int from,
-                                                     @Min(1) @RequestParam(
+                                                     @Positive @RequestParam(
                                                              value = "size", defaultValue = "10") int size) {
         log.info("Поиск событий пользователя с id: {} и параметрами from: {}, size: {}", userId, from, size);
         return eventService.getUsersEvents(userId, from, size);

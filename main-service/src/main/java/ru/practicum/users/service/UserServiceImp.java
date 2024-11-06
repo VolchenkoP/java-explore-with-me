@@ -75,6 +75,9 @@ public class UserServiceImp implements UserService {
 
     private void isUserExisted(long userId) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь с id: " + userId + " не найден"));
+                .orElseThrow(() -> {
+                    log.warn("Поиск несуществующего пользователя по id: {}", userId);
+                    return new NotFoundException("Пользователь с id: " + userId + " не найден");
+                });
     }
 }

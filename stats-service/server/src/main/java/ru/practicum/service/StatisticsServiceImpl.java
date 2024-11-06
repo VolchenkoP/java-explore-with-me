@@ -83,7 +83,10 @@ public class StatisticsServiceImpl implements StatisticsService {
     private App validationApp(String appName) {
         log.info("Поиск сервиса с именем: {}", appName);
         return appRepository.findByName(appName)
-                .orElseThrow(() -> new NotFoundException("Сервис с именем " + appName + " не найден"));
+                .orElseThrow(() -> {
+                    log.warn("Поиск несуществующего сервиса по имени: {}", appName);
+                    return new NotFoundException("Сервис с именем " + appName + " не найден");
+                });
     }
 
     private void validateDates(LocalDateTime start, LocalDateTime end) {

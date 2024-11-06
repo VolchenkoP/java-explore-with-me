@@ -1,10 +1,13 @@
 package ru.practicum.events.services;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import ru.practicum.StatisticDto;
 import ru.practicum.common.config.ConnectToStatServer;
 import ru.practicum.common.constants.Constants;
 import ru.practicum.common.utilites.Utilities;
@@ -21,6 +24,8 @@ import ru.practicum.requests.model.RequestStatus;
 import ru.practicum.requests.repository.RequestRepository;
 import ru.practicum.statisticsClient.StatisticClient;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -39,9 +44,30 @@ public class EventServicePublicImp implements EventsServicePublic {
 
     @Override
     public Collection<EventRespShort> searchEvents(String text, List<Integer> categories, Boolean paid,
-                                                   LocalDateTime rangeStart, LocalDateTime rangeEnd,
-                                                   boolean onlyAvailable, String sort, int from, int size) {
-        validateDates(rangeStart, rangeEnd);
+                                                   String rangeStart, String rangeEnd,
+                                                   boolean onlyAvailable, String sort, int from, int size,
+                                                   HttpServletRequest httpServletRequest) {
+
+        String ip = httpServletRequest.getRemoteAddr();
+        String path = httpServletRequest.getRequestURI();
+
+        log.info("Поиск события по параметрам: text: {}, categories: {}, paid: {}," +
+                        "rangeStart: {}, rangeEnd: {}, onlyAvailable: {}, sort: {}, from: {}, size: {}", text,
+                categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+        log.info("Пользователем с параметрами ip: {}, path: {}", ip, path);
+
+        StatisticDto statisticDto = prepareStatisticDto("ewm-main-service", path, ip);
+        ResponseEntity<Object> response = statisticClient.addStat(statisticDto);
+
+        validateResponses(response);
+
+        log.info("В сервер статистики ушел следующий запрос: statisticDto: {}",
+                statisticDto);
+
+        LocalDateTime start = convertToLocalDataTime(decode(rangeStart));
+        LocalDateTime end = convertToLocalDataTime(decode(rangeEnd));
+
+        validateDates(start, end);
         int startPage = from > 0 ? (from / size) : 0;
         Pageable pageable = PageRequest.of(startPage, size);
 
@@ -51,15 +77,15 @@ public class EventServicePublicImp implements EventsServicePublic {
         if (categories == null) {
             categories = List.of();
         }
-        if (rangeStart == null) {
-            rangeStart = LocalDateTime.now();
+        if (start == null) {
+            start = LocalDateTime.now();
         }
-        if (rangeEnd == null) {
-            rangeEnd = Constants.DEFAULT_END_TIME;
+        if (end == null) {
+            end = Constants.DEFAULT_END_TIME;
         }
 
         List<EventRespShort> events = eventRepository
-                .searchEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, pageable)
+                .searchEvents(text, categories, paid, start, end, onlyAvailable, pageable)
                 .stream()
                 .map(eventMapper::mapToEventRespShort)
                 .toList();
@@ -84,7 +110,18 @@ public class EventServicePublicImp implements EventsServicePublic {
     }
 
     @Override
-    public EventRespFull getEvent(long eventId, String path) {
+    public EventRespFull getEvent(long eventId, HttpServletRequest httpServletRequest) {
+
+        String ip = httpServletRequest.getRemoteAddr();
+        String path = httpServletRequest.getRequestURI();
+
+        StatisticDto statisticDto = prepareStatisticDto("ewm-main-service", path, ip);
+        ResponseEntity<Object> response = statisticClient.addStat(statisticDto);
+
+        validateResponses(response);
+
+        log.info("Следующий запрос ушел в сервис статистики: statisticDto: {}", statisticDto);
+
         Event event = eventRepository.findByIdAndState(eventId, String.valueOf(EventStates.PUBLISHED))
                 .orElseThrow(() -> {
                     log.warn("Поиск неизвестного события");
@@ -102,7 +139,7 @@ public class EventServicePublicImp implements EventsServicePublic {
         if (views.isEmpty()) {
             eventFull.setViews(0L);
         }
-        eventFull.setViews(views.get(0));
+        eventFull.setViews(views.getFirst());
         return eventFull;
     }
 
@@ -114,5 +151,41 @@ public class EventServicePublicImp implements EventsServicePublic {
             log.warn("Отклонено, начало не может быть позже окончания, начало: {}, окончание: {}", start, end);
             throw new ValidationException("Событие не опубликовано");
         }
+    }
+
+    private StatisticDto prepareStatisticDto(String app, String uri, String ip) {
+        return StatisticDto
+                .builder()
+                .app(app)
+                .uri(uri)
+                .ip(ip)
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    private void validateResponses(ResponseEntity<?> response) {
+        if (response.getStatusCode().is4xxClientError()) {
+            log.error("Ответ пришел с параметрами: Status code: {}, responseBody: {}", response.getStatusCode(),
+                    response.getBody());
+        }
+
+        if (response.getStatusCode().is5xxServerError()) {
+            log.error("Ответ пришел с параметрами: Status code: {}, responseBody: {}", response.getStatusCode(),
+                    response.getBody());
+        }
+    }
+
+    private String decode(String parameter) {
+        if (parameter == null) {
+            return null;
+        }
+        return URLDecoder.decode(parameter, StandardCharsets.UTF_8);
+    }
+
+    private LocalDateTime convertToLocalDataTime(String date) {
+        if (date == null) {
+            return null;
+        }
+        return LocalDateTime.parse(date, Constants.DATE_FORMATTER);
     }
 }

@@ -132,13 +132,19 @@ public class EventsServiceAdminImp implements EventsServiceAdmin {
     private Event validateAndGetEvent(long eventId) {
 
         return eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Событие с id: " + eventId + " не найдено"));
+                .orElseThrow(() -> {
+                    log.warn("Поиск несуществующего события по id: {}", eventId);
+                    return new NotFoundException("Событие с id: " + eventId + " не найдено");
+                });
     }
 
     private Category validateAndGetCategory(int categoryId) {
 
         return categoriesRepository.findById(categoryId)
-                .orElseThrow(() -> new NotFoundException("Категория с id = " + categoryId + " не найдена"));
+                .orElseThrow(() -> {
+                    log.warn("Поиск несуществующей категории по id: {}", categoryId);
+                    return new NotFoundException("Категория с id = " + categoryId + " не найдена");
+                });
     }
 
     private void checkAbilityToUpdate(Event event) {

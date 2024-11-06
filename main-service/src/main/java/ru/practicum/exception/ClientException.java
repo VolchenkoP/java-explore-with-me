@@ -2,7 +2,7 @@ package ru.practicum.exception;
 
 public class ClientException extends RuntimeException {
 
-    public ClientException(final String message) {
+    public ClientException(String message) {
         super(message);
     }
 }
