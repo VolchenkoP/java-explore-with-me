@@ -1,5 +1,6 @@
 package ru.practicum.events.repository;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -44,9 +45,21 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "  select count(id) " +
             "  from requests AS r " +
             "  WHERE r.event = e.id) < participants_limit) " +
-            "AND state = 'PUBLISHED')",
+            "AND state = 'PUBLISHED') " +
+            "ORDER BY e.event_date DESC " +
+            "LIMIT :limit OFFSET :offset",
+            countQuery = "SELECT COUNT(*) FROM events AS e WHERE (((e.annotation ILIKE :text OR e.description ILIKE :text) OR :text IS NULL) " +
+                    "AND (e.category IN (:category) OR :category IS NULL) " +
+                    "AND (e.paid = CAST(:paid AS boolean) OR :paid IS NULL) " +
+                    "AND (e.event_date BETWEEN :rangStart AND :rangeEnd) " +
+                    "AND (:isAvailable is TRUE " +
+                    "  OR( " +
+                    "  select count(id) " +
+                    "  from requests AS r " +
+                    "  WHERE r.event = e.id) < participants_limit) " +
+                    "AND state = 'PUBLISHED')",
             nativeQuery = true)
-    List<Event> searchEvents(@Param("text") String text, @Param("category") List<Integer> category,
+    Page<Event> searchEvents(@Param("text") String text, @Param("category") List<Integer> category,
                              @Param("paid") Boolean paid, @Param("rangStart") LocalDateTime rangStart,
                              @Param("rangeEnd") LocalDateTime rangeEnd, @Param("isAvailable") boolean isAvailable,
                              Pageable pageable);
