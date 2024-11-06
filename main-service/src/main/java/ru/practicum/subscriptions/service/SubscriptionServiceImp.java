@@ -44,8 +44,8 @@ public class SubscriptionServiceImp implements SubscriptionsService {
     private final EventRepository eventRepository;
     private final RequestRepository requestRepository;
     private final StatisticClient statisticClient;
-    private final UserMapper userMapper;
     private final SubscriptionMapper subscriptionMapper;
+    private final UserMapper userMapper;
     private final EventMapper eventMapper;
 
     @Override

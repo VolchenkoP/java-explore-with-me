@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import ru.practicum.subscriptions.dto.SubscriptionDto;
 import ru.practicum.subscriptions.model.Subscription;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface SubscriptionMapper {
 
     SubscriptionDto mapToSubscriptionDto(Subscription subscription);
