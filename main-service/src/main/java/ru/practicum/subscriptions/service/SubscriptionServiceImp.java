@@ -128,11 +128,13 @@ public class SubscriptionServiceImp implements SubscriptionsService {
                     + followerId + ")");
         }
 
-        subscriptionRepository.findByUserIdAndFollowerId(userId, followerId).orElseThrow(() -> {
-            log.warn("Пользователь с id: {} уже подписан на пользователя с id: {}", followerId, userId);
-            return new ConflictException("Пользователь с id: " + followerId +
-                    " уже подписан на пользователя с id: " + userId);
-        });
+        subscriptionRepository.findByUserIdAndFollowerId(userId, followerId)
+                .map(subscription -> {
+                    log.warn("Пользователь с id: {} уже подписан на пользователя с id: {}", followerId, userId);
+                    throw new ConflictException("Пользователь с id: " + followerId +
+                            " уже подписан на пользователя с id: " + userId);
+                })
+                .orElseThrow();
     }
 
     private User validateAndGetUser(long userId) {
