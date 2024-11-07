@@ -1,8 +1,11 @@
 package ru.practicum.subscriptions.controller;
 
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +25,7 @@ import java.util.List;
 @RequestMapping("/subscription")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class SubscriptionsController {
 
     private final SubscriptionsService subscriptionsService;
@@ -61,8 +65,10 @@ public class SubscriptionsController {
     @GetMapping("/{userId}/events")
     @ResponseStatus(HttpStatus.OK)
     public List<EventRespShort> getUsersEvents(@PathVariable(name = "userId") long userId,
-                                               @RequestParam(value = "from", defaultValue = "0") int from,
-                                               @RequestParam(value = "size", defaultValue = "10") int size) {
+                                               @PositiveOrZero @RequestParam(value = "from",
+                                                       defaultValue = "0") int from,
+                                               @Positive @RequestParam(value = "size",
+                                                       defaultValue = "10") int size) {
         log.info("Поиск событий пользователя с id: {} и параметрами from: {}, size: {}", userId, from, size);
         return subscriptionsService.getUsersEvents(userId, from, size);
     }
