@@ -30,6 +30,7 @@ import ru.practicum.users.repository.UserRepository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -128,13 +129,12 @@ public class SubscriptionServiceImp implements SubscriptionsService {
                     + followerId + ")");
         }
 
-        subscriptionRepository.findByUserIdAndFollowerId(userId, followerId)
-                .map(subscription -> {
-                    log.warn("Пользователь с id: {} уже подписан на пользователя с id: {}", followerId, userId);
-                    throw new ConflictException("Пользователь с id: " + followerId +
-                            " уже подписан на пользователя с id: " + userId);
-                })
-                .orElseThrow();
+        Optional<Subscription> subscription = subscriptionRepository.findByUserIdAndFollowerId(userId, followerId);
+        if (subscription.isPresent()) {
+            log.warn("Пользователь с id: {} уже подписан на пользователя с id: {}", followerId, userId);
+            throw new ConflictException("Пользователь с id: " + followerId +
+                    " уже подписан на пользователя с id: " + userId);
+        }
     }
 
     private User validateAndGetUser(long userId) {
