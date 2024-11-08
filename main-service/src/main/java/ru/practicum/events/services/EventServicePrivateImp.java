@@ -263,19 +263,28 @@ public class EventServicePrivateImp implements EventServicePrivate {
     private Event validateAndGetEvent(long eventId) {
 
         return eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Событие с id = " + eventId + " не найдено"));
+                .orElseThrow(() -> {
+                    log.warn("Попытка обратиться к несуществующему событию по id: {}", eventId);
+                    return new NotFoundException("Событие с id = " + eventId + " не найдено");
+                });
     }
 
     private User validateAndGetUser(long userId) {
 
         return userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь с id = " + userId + " не найден"));
+                .orElseThrow(() -> {
+                    log.warn("Попытка обратиться к несуществующему пользователю по id: {}", userId);
+                    return new NotFoundException("Пользователь с id = " + userId + " не найден");
+                });
     }
 
     private Category validateAndGetCategory(int categoryId) {
 
         return categoriesRepository.findById(categoryId)
-                .orElseThrow(() -> new NotFoundException("Категория с id = " + categoryId + " не найдена"));
+                .orElseThrow(() -> {
+                    log.warn("Попытка обратиться к несуществующей категории по id: {}", categoryId);
+                    return new NotFoundException("Категория с id = " + categoryId + " не найдена");
+                });
     }
 
     private void checkAbilityToUpdate(Event event) {

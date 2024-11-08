@@ -2,6 +2,7 @@ package ru.practicum.requests.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ru.practicum.requests.dto.EventIdByRequestsCount;
 import ru.practicum.requests.model.Requests;
 
@@ -18,10 +19,11 @@ public interface RequestRepository extends JpaRepository<Requests, Long> {
 
     @Query(value = "select count(id), event " +
             "from requests " +
-            "where event IN ?1 " +
-            "AND status LIKE ?2 " +
-            "group by event ", nativeQuery = true)
-    List<EventIdByRequestsCount> countByEventIdInAndStatusGroupByEvent(List<Long> eventId, String requestState);
+            "where event IN :eventId " +
+            "AND status LIKE :requestState " +
+            "group by event", nativeQuery = true)
+    List<EventIdByRequestsCount> countByEventIdInAndStatusGroupByEvent(@Param("eventId") List<Long> eventId,
+                                                                       @Param("requestState") String requestState);
 
     List<Requests> findByIdInAndEventId(List<Long> id, long eventId);
 

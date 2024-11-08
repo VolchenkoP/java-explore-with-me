@@ -1,7 +1,8 @@
 package ru.practicum.events.controller;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -52,8 +53,8 @@ public class EventAdminController {
                     pattern = Constants.DATA_PATTERN) LocalDateTime rangeStart,
             @RequestParam(value = "rangeEnd", required = false) @DateTimeFormat(
                     pattern = Constants.DATA_PATTERN) LocalDateTime rangeEnd,
-            @Min(0) @RequestParam(value = "from", defaultValue = "0") int from,
-            @Min(1) @RequestParam(value = "size", defaultValue = "10") int size) {
+            @PositiveOrZero @RequestParam(value = "from", defaultValue = "0") int from,
+            @Positive @RequestParam(value = "size", defaultValue = "10") int size) {
 
         log.info("Поиск администратором события по параметрам users: {}, states: {}," +
                         "categories: {}, rangeStart: {}, rangeEnd: {}, from: {}, size: {}", users, states,

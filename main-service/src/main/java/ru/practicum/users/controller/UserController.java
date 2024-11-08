@@ -1,7 +1,8 @@
 package ru.practicum.users.controller;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -40,8 +41,8 @@ public class UserController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Collection<UserDto> getUsers(@RequestParam(value = "ids", required = false) Set<Integer> ids,
-                                        @Min(0) @RequestParam(value = "from", defaultValue = "0") int from,
-                                        @Min(1) @RequestParam(value = "size", defaultValue = "10") int size) {
+                                        @PositiveOrZero @RequestParam(value = "from", defaultValue = "0") int from,
+                                        @Positive @RequestParam(value = "size", defaultValue = "10") int size) {
         log.info("Поиск пользователей по параметрам ids: {}, from: {}, size: {}", ids, from, size);
         return userService.getUsers(ids, from, size);
     }

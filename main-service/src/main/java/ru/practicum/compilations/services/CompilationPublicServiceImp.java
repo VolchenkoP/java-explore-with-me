@@ -103,8 +103,10 @@ public class CompilationPublicServiceImp implements CompilationPublicService {
     }
 
     private Compilation validateAndCompilation(int compId) {
-
         return compilationRepository.findById(compId)
-                .orElseThrow(() -> new NotFoundException("Компиляция с id: " + compId + " не найдена"));
+                .orElseThrow(() -> {
+                    log.warn("Попытка проваледировать несуществующую компиляцию с id: {}", compId);
+                    return new NotFoundException("Компиляция с id: " + compId + " не найдена");
+                });
     }
 }

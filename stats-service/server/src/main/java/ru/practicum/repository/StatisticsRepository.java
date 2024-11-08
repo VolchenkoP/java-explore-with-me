@@ -2,6 +2,7 @@ package ru.practicum.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ru.practicum.StatisticResponse;
 import ru.practicum.model.Statistics;
 
@@ -12,33 +13,38 @@ public interface StatisticsRepository extends JpaRepository<Statistics, Long> {
 
     @Query("SELECT new ru.practicum.StatisticResponse(st.app, st.uri, COUNT(st.ip)) " +
             "FROM Statistics AS st " +
-            "WHERE st.uri IN ?1 " +
-            "AND st.timestamp BETWEEN ?2 AND ?3 " +
+            "WHERE st.uri IN :uriList " +
+            "AND st.timestamp BETWEEN :startDateTime AND :endDateTime " +
             "GROUP BY st.app, st.uri " +
             "ORDER BY COUNT(st.ip) DESC ")
-    List<StatisticResponse> findByUriInAndStartBetween(Iterable<String> uri, LocalDateTime start, LocalDateTime end);
+    List<StatisticResponse> findByUriInAndStartBetween(@Param("uriList") Iterable<String> uri,
+                                                       @Param("startDateTime") LocalDateTime start,
+                                                       @Param("endDateTime") LocalDateTime end);
 
     @Query("SELECT new ru.practicum.StatisticResponse(st.app, st.uri, COUNT(DISTINCT st.ip)) " +
             "FROM Statistics AS st " +
-            "WHERE st.uri IN ?1 " +
-            "AND st.timestamp BETWEEN ?2 AND ?3 " +
+            "WHERE st.uri IN :uriList " +
+            "AND st.timestamp BETWEEN :startDateTime AND :endDateTime " +
             "GROUP BY st.app, st.uri " +
             "ORDER BY COUNT(st.ip) DESC ")
-    List<StatisticResponse> findByUriInAndStartBetweenUniqueIp(Iterable<String> uri, LocalDateTime start,
-                                                               LocalDateTime end);
+    List<StatisticResponse> findByUriInAndStartBetweenUniqueIp(@Param("uriList") Iterable<String> uri,
+                                                               @Param("startDateTime") LocalDateTime start,
+                                                               @Param("endDateTime") LocalDateTime end);
 
     @Query("SELECT new ru.practicum.StatisticResponse(st.app, st.uri, COUNT(DISTINCT st.ip)) " +
             "FROM Statistics AS st " +
-            "WHERE st.timestamp BETWEEN ?1 AND ?2 " +
+            "WHERE st.timestamp BETWEEN :startDateTime AND :endDateTime " +
             "GROUP BY st.app, st.uri " +
             "ORDER BY COUNT(st.ip) DESC ")
-    List<StatisticResponse> findStartBetween(LocalDateTime start, LocalDateTime end);
+    List<StatisticResponse> findStartBetween(@Param("startDateTime") LocalDateTime start,
+                                             @Param("endDateTime") LocalDateTime end);
 
     @Query("SELECT new ru.practicum.StatisticResponse(st.app, st.uri, COUNT(st.ip)) " +
             "FROM Statistics AS st " +
-            "WHERE st.timestamp BETWEEN ?1 AND ?2 " +
+            "WHERE st.timestamp BETWEEN :startDateTime AND :endDateTime " +
             "GROUP BY st.app, st.uri " +
             "ORDER BY COUNT(st.ip) DESC ")
-    List<StatisticResponse> findStartBetweenUniqueIp(LocalDateTime start, LocalDateTime end);
+    List<StatisticResponse> findStartBetweenUniqueIp(@Param("startDateTime") LocalDateTime start,
+                                                     @Param("endDateTime") LocalDateTime end);
 
 }

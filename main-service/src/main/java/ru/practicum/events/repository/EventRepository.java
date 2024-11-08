@@ -3,6 +3,7 @@ package ru.practicum.events.repository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ru.practicum.events.model.Event;
 
 import java.time.LocalDateTime;
@@ -21,12 +22,16 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query(value = "SELECT * " +
             "FROM events AS e " +
-            "WHERE ((e.state IN (?1) OR ?1 IS NULL) " +
-            "AND (e.category IN (?2) OR ?2 IS NULL) " +
-            "AND (e.initiator IN (?3) OR ?3 IS NULL) " +
-            "AND (e.event_date BETWEEN ?4 AND ?5)) ", nativeQuery = true)
-    List<Event> findByConditionals(List<String> state, List<Integer> category, List<Long> initiator,
-                                   LocalDateTime rangeStart, LocalDateTime rangeEnd, Pageable pageable);
+            "WHERE ((e.state IN (:state) OR :state IS NULL) " +
+            "AND (e.category IN (:category) OR :category IS NULL) " +
+            "AND (e.initiator IN (:initiator) OR :initiator IS NULL) " +
+            "AND (e.event_date BETWEEN :rangeStart AND :rangeEnd)) ", nativeQuery = true)
+    List<Event> findByConditionals(@Param("state") List<String> state,
+                                   @Param("category") List<Integer> category,
+                                   @Param("initiator") List<Long> initiator,
+                                   @Param("rangeStart") LocalDateTime rangeStart,
+                                   @Param("rangeEnd") LocalDateTime rangeEnd,
+                                   Pageable pageable);
 
     @Query(value = "SELECT * " +
             "FROM events AS e " +

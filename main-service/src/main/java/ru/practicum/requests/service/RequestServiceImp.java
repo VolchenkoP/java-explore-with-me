@@ -154,19 +154,28 @@ public class RequestServiceImp implements RequestService {
     private Requests validateRequest(long requestId) {
 
         return requestRepository.findById(requestId)
-                .orElseThrow(() -> new NotFoundException("Запрос с id = " + requestId + " не найден"));
+                .orElseThrow(() -> {
+                    log.warn("Поиск несуществующего запроса по id: {}", requestId);
+                    return new NotFoundException("Запрос с id = " + requestId + " не найден");
+                });
     }
 
     private Event validateEvent(long eventId) {
 
         return eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Событие с id: " + eventId + " не найдено"));
+                .orElseThrow(() -> {
+                    log.warn("Поиск несуществующего события по id: {}", eventId);
+                    return new NotFoundException("Событие с id: " + eventId + " не найдено");
+                });
     }
 
     private User validateUser(long userId) {
 
         return userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь с id = " + userId + " не найден"));
+                .orElseThrow(() -> {
+                    log.warn("Поиск несуществующего пользователя по id: {}", userId);
+                    return new NotFoundException("Пользователь с id = " + userId + " не найден");
+                });
     }
 }
 

@@ -66,8 +66,10 @@ public class CategoriesServiceImp implements CategoriesService {
     }
 
     private Category validateCategory(int categoryId) {
-
         return categoriesRepository.findById(categoryId)
-                .orElseThrow(() -> new NotFoundException("Категория с id = " + categoryId + " не найдена"));
+                .orElseThrow(() -> {
+                    log.warn("Попытка удалить несуществующую категорию с id: {}", categoryId);
+                    return new NotFoundException("Категория с id = " + categoryId + " не найдена");
+                });
     }
 }
